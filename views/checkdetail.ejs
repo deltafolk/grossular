@@ -1,0 +1,251 @@
+<%- include('layout/head.ejs')%>
+<%- include('layout/navbar.ejs')%>
+
+
+<!-- ///////////////////////เริ่มต้นการประมวลผล -->
+<% if (data_result == null) { %>
+    <div class="container d-flex justify-content-center mt-5">
+        <div class="bg-light p-3 rounded-3 shadow" style="height: auto; width: 700px">
+            <center><div class="loader"></div><div id='progress' class="text-center p-3" style="font-size: 14pt">0%</div></center>
+            <div class="text-center pb-3">กำลังประมวลผลเชิงพื้นที่ โปรดรอสักครู่... <br>ขั้นตอนนี้อาจใช้เวลาสักพัก กรุณาอย่าปิดหน้าต่างนี้ จนกว่าขั้นตอนนี้จะเสร็จสิ้น</div>
+        </div>
+    </div>
+
+
+
+
+<form id='data_form' action="/showDetail" method="post">
+    <input type="hidden" name='idkey' value="<%= idkey %>">
+    <input type="hidden" name='publickey' value="<%= publickey %>">
+    <textarea id='data' name='data' style='display:none;'><%= JSON.stringify(data) %></textarea>
+    <textarea id='data_result' name='data_result' style='display:none;'></textarea>
+</form>
+
+<% for (var n = 0; n < main_db.length; n++) {%>
+    <script src='/jsdata/<%- (main_db[n].keyname) %>'></script>
+    <script>
+        var myDiv = document.getElementById("progress");
+        myDiv.innerHTML = "<%=((1+n)*0.2/(main_db.length*2))*100|0 %>%";
+    </script>
+<% } %>
+
+<script src="https://unpkg.com/@turf/turf"></script>
+
+<!-- ส่วนของ point -->
+<% if (type == 'point') { %>
+    <script>    
+        let jsoninput = <%- jsondata%>; 
+        const overlap_array = [];
+        const overlap_desc = [];
+    
+    </script>
+    
+    <% for (var m = 0; m < main_db.length; m++) {%>
+    
+    <script>
+    
+    var myDiv = document.getElementById("progress");
+    myDiv.innerHTML = "<%=(((main_db.length)+1+m)*0.8/(main_db.length*2))*100|0 %>%";
+    
+    for (var i = 0; i < <%- main_db[m].keyname %>.features.length; i++){
+        var inputdb = <%- main_db[m].keyname %>.features[i].geometry;
+        var inputdbx = turf.buffer(inputdb, 0.005);
+    
+        for (var j = 0; j < jsoninput.features.length; j++){
+            var inputrecord = jsoninput.features[j].geometry;
+            var inputrecordx = turf.buffer(inputrecord, 0.005);
+            var inputamount = turf.area(inputrecordx);
+    
+            if (inputdb != null) {
+                var intersect = turf.intersect(inputrecordx, inputdbx);
+    
+                if(intersect != null){
+    
+                    var a_intersect = turf.area(intersect);
+    
+                    let overlapData = {
+                        feature: j+1,
+                        name:'<%- main_db[m].name %>',
+                        dbkeyname:'<%- main_db[m].keyname %>',
+                        color: '<%- main_db[m].color %>',
+                        desc_:<%- main_db[m].keyname %>.features[i].properties.DESC_,
+                        input_amnt:inputamount,
+                        cal_amnt:a_intersect,
+                        percent:((a_intersect/inputamount)*100).toFixed(),
+                    }
+    
+                    overlap_array.push(overlapData);
+                }
+            }
+        }
+    
+    }
+    //console.log(overlap_array);
+    </script>
+    <% } %>
+    
+    
+    <!-- ส่วนของ line -->
+    <% } else if (type == 'line') { %>   
+    
+    <script>    
+        let jsoninput = <%- jsondata%>; 
+        const overlap_array = [];
+        const overlap_desc = [];
+        const amount = 0;
+    
+    </script>
+    
+    <% for (var m = 0; m < main_db.length; m++) {%>
+    <script>
+    
+    var myDiv = document.getElementById("progress");
+    myDiv.innerHTML = "<%=(((main_db.length)+1+m)*0.8/(main_db.length*2))*100|0 %>%";
+    
+    for (var i = 0; i < <%- main_db[m].keyname %>.features.length; i++){
+        var inputdb = <%- main_db[m].keyname %>.features[i].geometry;
+        var inputdbx = turf.buffer(inputdb, 0.005);
+    
+        for (var j = 0; j < jsoninput.features.length; j++){
+            var inputrecord = jsoninput.features[j].geometry;
+            var inputrecordx = turf.buffer(inputrecord, 0.005);
+            var inputamount = turf.area(inputrecordx);
+    
+            if (inputdb != null){
+    
+                var intersect = turf.intersect(inputrecordx, inputdbx);
+    
+                if(intersect != null){
+    
+                    var a_intersect = turf.area(intersect);
+    
+                    let overlapData = {
+                        feature: j+1,
+                        name:'<%- main_db[m].name %>',
+                        dbkeyname:'<%- main_db[m].keyname %>',
+                        color: '<%- main_db[m].color %>',
+                        desc_:<%- main_db[m].keyname %>.features[i].properties.DESC_,
+                        input_amnt:inputamount,
+                        cal_amnt:a_intersect,
+                        percent:((a_intersect/inputamount)*100).toFixed(),
+                    }
+    
+                    overlap_array.push(overlapData);
+                }
+            }
+        }
+    
+    }
+    //console.log(overlap_array);
+    </script>
+    
+    <% } %>
+    
+    
+    
+    <!-- ส่วนของ polygon -->
+    <% } else { %>   
+    <script>    
+        let jsoninput = <%- jsondata%>; 
+        const overlap_array = [];
+        const overlap_desc = [];
+    
+    </script>
+    <% for (var m = 0; m < main_db.length; m++) {%>
+    <script>
+    
+    var myDiv = document.getElementById("progress");
+    myDiv.innerHTML = "<%=(((main_db.length)+1+m)*0.8/(main_db.length*2))*100|0 %>%";
+    
+    for (var i = 0; i < <%- main_db[m].keyname %>.features.length; i++){
+        var inputdb = <%- main_db[m].keyname %>.features[i].geometry;
+        for (var j = 0; j < jsoninput.features.length; j++){
+            var inputrecord = jsoninput.features[j].geometry;
+            var inputamount = turf.area(inputrecord);
+    
+            if (inputdb != null){
+                var intersect = turf.intersect(inputrecord, inputdb);
+                if(intersect != null){
+    
+                    var a_intersect = turf.area(intersect);
+    
+                    let overlapData = {
+                        feature: j+1,
+                        name:'<%- main_db[m].name %>',
+                        dbkeyname:'<%- main_db[m].keyname %>',
+                        color: '<%- main_db[m].color %>',
+                        desc_:<%- main_db[m].keyname %>.features[i].properties.DESC_,
+                        input_amnt:inputamount,
+                        cal_amnt:a_intersect,
+                        percent:((a_intersect/inputamount)*100).toFixed(),
+                    }
+    
+                    overlap_array.push(overlapData);
+                }
+            }
+        }
+    
+    }
+    
+    //console.log(overlap_array);
+    </script>
+    
+    <% } %>
+    
+    
+    <% } %>
+    
+
+<script>
+    var textareax = document.getElementById('data_result');
+    textareax.value = (JSON.stringify(overlap_array));
+    document.getElementById('data_form').submit();
+</script>
+
+
+
+
+
+
+
+
+<!-- ///////////////////////ประมาวลผลเสร็จ ให้แสดงส่วนนี้ -->
+<% } else { %>
+
+<div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow border" style="height: auto; width: 100%;">
+        <div class="text-end p-3">
+    </div>
+    <p class='text-center h5 p-3'><img src='../images/table.svg' height='40px' width='40px'><b><u> ข้อมูลเชิงพื้นที่</u></b></p>
+    
+    <div class="px-3">
+    <b>ชื่อกิจกรรม </b> <%= data[0].actname %><br>
+    <b>ชื่อหน่วยงาน</b> <%= data[0].offname %><br>
+    <b>ปีงบประมาณ พ.ศ.</b> <%= data[0].year %><br>
+    <b>จำนวนตามแผนงบประมาณ </b> <%= data[0].amount %> <% if (data[0].type == 'point') { %>แห่ง<% } else if (data[0].type == 'line') { %>กิโลเมตร<% } else { %>ไร่<% } %><br><br>
+    <b>ข้อมูลเชิงพื้นที่</b><br>
+
+
+    <table class='table table-hover'>
+        <th></th>
+        <th>อยู่ในพื้นที่</th>
+        <th class='text-center'>--------</th>
+        <th>รายละเอียดของพื้นที่</th>
+        <th class='text-center'>คิดเป็นร้อยละ</th>
+        <% for (var i = 0; i < data_result.length; i++) { %>
+            <tr><td class='text-center' style='color:<%= data_result[i].color %>;'>&#9632;</td><td><%= data_result[i].name %></td><td><% if (data[0].type == 'point') { %>แห่งที่ <% } else if (data[0].type == 'line') { %>เส้นที่ <% } else { %>แปลงที่ <% } %><%= data_result[i].feature %></td><td><%= data_result[i].desc_ %></td><td class='text-center'><%= data_result[i].percent %></td></tr>
+        <% } %>
+
+    </table>
+    <div class='p-0 mx-4 my-0 text-dark' style='font-size:14px;'> <u>หมายเหตุ</u> ร้อยละของพื้นที่ อาจมีค่ามากกว่า หรือน้อยกว่า 100 เนื่องมาจากความคลาดเคลื่อนเชิงพื้นที่ของฐานข้อมูลหลัก การทับซ้อนของข้อมูลภายในฐานข้อมูลหลัก ข้อมูลอยู่นอกบริเวณพื้นที่ให้บริการ โปรดใช้ข้อมูลดังกล่าวด้วยความระมัดระวัง</div><br>
+    </div>
+    <p class='text-center p-2'>
+
+        <a href="/home" class='btn btn-secondary'>ย้อนกลับ</a>
+    </p>
+</div>
+</div>
+<br>
+
+
+<% } %>

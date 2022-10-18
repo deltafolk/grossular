@@ -1,0 +1,258 @@
+<%- include('layout/head.ejs')%>
+<%- include('layout/navbar.ejs')%>
+
+
+    <div class="container d-flex justify-content-center mt-5">
+        <div class="bg-light pt-3 rounded-3 shadow" style="height: auto; width: 700px">
+            <center><div class="loader"></div></center><br>
+            <div class="text-center pb-3">กำลังตรวจสอบพื้นที่ทับซ้อน โปรดรอสักครู่... <br>ขั้นตอนนี้อาจใช้เวลาสักพัก กรุณาอย่าปิดหน้าต่างนี้ จนกว่าขั้นตอนนี้จะเสร็จสิ้น</div>
+        </div>
+    </div>
+
+
+
+
+<form id='overlap_form' action="/updateOverlap" method="post">
+    <input type="hidden" name='idkey' value="<%= idkey %>">
+    <textarea id='overlap_data' name='overlap_data' style='display:none;'></textarea>
+</form>
+
+<% Object.values(main_db).forEach(function(item) {%>
+    <script src='/jsdata/<%- (item.keyname) %>'></script>
+<% }) %>
+
+<script src="https://unpkg.com/@turf/turf"></script>
+
+<!-- ส่วนของ point -->
+<% if (type == 'point') { %>
+<script>    
+    let jsoninput = <%- jsondata%>; 
+    const overlap_array = [];
+    const overlap_desc = [];
+
+</script>
+
+<% Object.values(main_db).forEach(function(item) {%>
+<script>
+for (var i = 0; i < <%- item.keyname %>.features.length; i++){
+    var inputdb = <%- item.keyname %>.features[i].geometry;
+    var inputdbx = turf.buffer(inputdb, 0.005);
+
+    for (var j = 0; j < jsoninput.features.length; j++){
+        var inputrecord = jsoninput.features[j].geometry;
+        var inputrecordx = turf.buffer(inputrecord, 0.005);
+
+        if (inputdb != null) {
+            var intersect = turf.intersect(inputrecordx, inputdbx);
+
+            if(intersect != null){
+
+
+                let overlapData = {
+                    name:'<%- item.name %>',
+                    dbkeyname:'<%- item.keyname %>',
+                    desc_:<%- item.keyname %>.features[i].properties.DESC_,
+                    overlapJSON:intersect,
+                }
+
+                overlap_array.push(overlapData);
+            }
+        }
+    }
+
+}
+//console.log(overlap_array);
+</script>
+<% }) %>
+
+<!-- ส่วนของ userdata point -->
+<% for (var k = 0 ; k < userdata.length; k++) {%>
+<script>
+var input_userdata = <%- userdata[k].jsondata %>;
+for (var i = 0; i < input_userdata.features.length; i++){
+    var feature_userdata = input_userdata.features[i].geometry;
+    var feature_userdatax = turf.buffer(feature_userdata, 0.005);
+
+    for (var j = 0; j < jsoninput.features.length; j++){
+        var inputrecord = jsoninput.features[j].geometry;
+        var inputrecordx = turf.buffer(inputrecord, 0.005);
+
+        if (feature_userdata != null) {
+            var intersect = turf.intersect(feature_userdatax, inputrecordx);
+
+            if(intersect != null){
+
+
+                let overlapData = {
+                    name:'<%- userdata[k].offname %> *',
+                    dbkeyname:'<%- userdata[k].idkey %>',
+                    desc_:input_userdata.features[i].properties.DESC_,
+                    overlapJSON:intersect,
+                }
+
+                overlap_array.push(overlapData);
+            }
+        }
+    }
+
+}
+//console.log(overlap_array);
+</script>
+<% } %>
+
+
+<!-- ส่วนของ line -->
+<% } else if (type == 'line') { %>   
+
+<script>    
+    let jsoninput = <%- jsondata%>; 
+    const overlap_array = [];
+    const overlap_desc = [];
+
+</script>
+
+<% Object.values(main_db).forEach(function(item) {%>
+<script>
+for (var i = 0; i < <%- item.keyname %>.features.length; i++){
+    var inputdb = <%- item.keyname %>.features[i].geometry;
+    for (var j = 0; j < jsoninput.features.length; j++){
+        var inputrecord = jsoninput.features[j].geometry;
+        if (inputdb != null){
+            var intersect = turf.lineIntersect(inputrecord, inputdb);
+            if(intersect.features.length != 0){
+
+                let overlapData = {
+                    name:'<%- item.name %>',
+                    dbkeyname:'<%- item.keyname %>',
+                    desc_:<%- item.keyname %>.features[i].properties.DESC_,
+                    overlapJSON:intersect,
+                }
+
+                overlap_array.push(overlapData);
+            }
+        }
+    }
+
+}
+//console.log(overlap_array);
+</script>
+
+<% }) %>
+
+<!-- ส่วนของ userdata line -->
+<% for (var k = 0 ; k < userdata.length; k++) {%>
+<script>
+var input_userdata = <%- userdata[k].jsondata %>;
+for (var i = 0; i < input_userdata.features.length; i++){
+    var feature_userdata = input_userdata.features[i].geometry;
+
+    for (var j = 0; j < jsoninput.features.length; j++){
+        var inputrecord = jsoninput.features[j].geometry;
+
+        if (feature_userdata != null) {
+            var intersect = turf.lineIntersect(feature_userdata, inputrecord);
+
+            if(intersect.features.length != 0){
+
+
+                let overlapData = {
+                    name:'<%- userdata[k].offname %> *',
+                    dbkeyname:'<%- userdata[k].idkey %>',
+                    desc_:input_userdata.features[i].properties.DESC_,
+                    overlapJSON:intersect,
+                }
+
+                overlap_array.push(overlapData);
+            }
+        }
+    }
+
+}
+//console.log(overlap_array);
+</script>
+<% } %>
+
+
+
+
+
+
+<!-- ส่วนของ polygon -->
+<% } else { %>   
+<script>    
+    let jsoninput = <%- jsondata%>; 
+    const overlap_array = [];
+    const overlap_desc = [];
+
+</script>
+<% Object.values(main_db).forEach(function(item) {%>
+<script>
+for (var i = 0; i < <%- item.keyname %>.features.length; i++){
+    var inputdb = <%- item.keyname %>.features[i].geometry;
+    for (var j = 0; j < jsoninput.features.length; j++){
+        var inputrecord = jsoninput.features[j].geometry;
+        if (inputdb != null){
+            var intersect = turf.intersect(inputrecord, inputdb);
+            if(intersect != null){
+
+                let overlapData = {
+                    name:'<%- item.name %>',
+                    dbkeyname:'<%- item.keyname %>',
+                    desc_:<%- item.keyname %>.features[i].properties.DESC_,
+                    overlapJSON:intersect,
+                }
+
+                overlap_array.push(overlapData);
+            }
+        }
+    }
+
+}
+
+//console.log(overlap_array);
+</script>
+
+<% }) %>
+
+
+<!-- ส่วนของ userdata polygon -->
+<% for (var k = 0 ; k < userdata.length; k++) {%>
+<script>
+var input_userdata = <%- userdata[k].jsondata %>;
+for (var i = 0; i < input_userdata.features.length; i++){
+    var feature_userdata = input_userdata.features[i].geometry;
+
+    for (var j = 0; j < jsoninput.features.length; j++){
+        var inputrecord = jsoninput.features[j].geometry;
+
+        if (feature_userdata != null) {
+            var intersect = turf.intersect(feature_userdata, inputrecord);
+
+            if(intersect != null){
+
+
+                let overlapData = {
+                    name:'<%- userdata[k].offname %> *',
+                    dbkeyname:'<%- userdata[k].idkey %>',
+                    desc_:input_userdata.features[i].properties.DESC_,
+                    overlapJSON:intersect,
+                }
+
+                overlap_array.push(overlapData);
+            }
+        }
+    }
+
+}
+//console.log(overlap_array);
+</script>
+<% } %>
+
+
+<% } %>
+
+<script>
+    var textareax = document.getElementById('overlap_data');
+    textareax.value = (JSON.stringify(overlap_array));
+    document.getElementById('overlap_form').submit();
+</script>

@@ -1,0 +1,158 @@
+<%- include('../layout/head.ejs')%>
+<%- include('../layout/navbar_admin.ejs')%>
+
+
+<div class="container d-flex justify-content-center mt-4">
+    <div class="bg-light p-1 rounded-3 shadow" style="height: auto; width: 100%">
+        <div class="text-end p-2"><img src='images/user.png' height='25px' width='25px'> GIS Admin
+    </div>
+    <div class="p-2 h5"><b><u>ค้นหาข้อมูลของผู้ใช้</u></b></p>
+
+    <form class="text-center" action='/userdata_search' method="POST">
+
+    <table style="width:100%">
+    <tr>
+    <td>
+    <div class='py-3 text-start' style='font-size:16px;'><b>เลือกกิจกรรม</b></div>
+    <select class='form-select' name='actkey'>
+    <% for (var i = 0; i < act.length; i++) { %>
+        <option value='<%= act[i].actkey %>' <% if (actkey_req == act[i].actkey) { %> selected <% } %>><% if (act[i].acttype == "point") { %> &#x2219; <% } else if (act[i].acttype == "line") { %> &#8736; <% } else { %> &#x2B22; <% } %><%= act[i].actname %></option>
+    <% } %>
+    </select>
+    </td>
+
+    <td>
+    <div class='py-3 text-start' style='font-size:16px;'><b>งบประมาณ</b></div>
+    <select class='form-select' name='year'>
+    <% for(var j=0; j < year.length; j++) { %>
+        <option value='<%= year[j] %>' <% if (year_req == year[j]) { %> selected <% } %>><%= year[j] %></option>
+    <% } %>
+    </select>
+    </td>
+    <td>
+    <div class='py-3 text-start' style='font-size:16px;'><b></b></div>
+    <div class='text-center'><input class='btn btn-warning mt-4' type='submit' value='ค้นหา'></div>
+    </td>
+    </tr>
+    </table>
+
+</form>
+</div>
+</div>
+</div>
+
+
+<div class="container d-flex justify-content-center mt-4">
+<div class="bg-light p-1 rounded-3 shadow" style="height: 550px; width: 100%">
+
+<div id="map" class=""></div>
+<% if (actname != '') { %>
+<div class='p-2 pt-3 h6'><b><u><%= actname %></b></u></div>
+<% } else { %>
+<div class='p-2 pt-3 h6'><b><u>กรุณาเลือกกิจกรรม และปีงบประมาณ เพื่อค้นหาข้อมูล</u></b></div>
+<% } %>
+</div>
+</div>
+
+<div class="container d-flex justify-content-center mt-4">
+<div class="bg-light p-1 rounded-3 shadow" style="height: auto; width: 100%">
+<div class="overflow_ py-3 ms-3" style="height:300px; overflow-y: scroll;">
+<table class="table table-hover">
+    <th>ลำดับ</th>
+    <th></th>
+    <th>หน่วยงาน</th>
+    <th>กิจกรรม</th>
+    <th>แก้ไขล่าสุด</th>
+    <th>หมายเหตุ</th>
+    <th></th>
+<% if (data.length != 0) { %>
+    <% for (var k = 0; k < data.length; k++) { %>
+    <tr>
+        <td><%= k+1 %></td>
+        <td><i style="color:<%= data[k].color%>" class="fa fa-circle" aria-hidden="true"></i></td>
+        <td><%= data[k].offname %></td>
+        <td><%= data[k].actname %> ปี พ.ศ.<%= data[k].year %> จำนวน <%= data[k].amount %></td>
+        <td><%= data[k].date %></td>
+        <td><%= data[k].note %></td>
+        <td class='text-center'>
+        </td>
+    </tr>
+    <% } %>
+<% } else { %>
+</table>
+<div class='alert alert-secondary p-2 m-2 text-center'><i class="fa fa-info-circle" aria-hidden="true"></i> ไม่มีข้อมูลของกิจกรรมนี้ </div>
+<% } %>
+
+</table>
+</div>
+</div>
+</div>
+<br>
+<div class="text-center"><button onclick="window.location.href='/dwluserdata?actkey=<%= actkey_req%>&year=<%= year_req%>'" class="btn btn-primary p-2 <% if (data.length == 0) { %>disabled<%}%>">ดาวน์โหลดทั้งหมด</button></div><br>
+
+<script>
+    
+    var map = new L.Map('map',{zoomControl:true, maxZoom:18, minZoom:8, maxNativeZoom: 18, minNativeZoom: 8, zoomSnap: 0.5, fullscreenControl: true, fullscreenControlOptions: { position: 'topleft'}}).setView([18.81,100.79], 8.5);
+    var autolinker = new Autolinker({}); //ดึงเข้ามูลใน json มาแสดงในคำอธิบาย
+    
+    var bounds_group = new L.featureGroup([]); // group เอาไว้ใส่ชนิดข้อมูล
+    var point_gp = new L.featureGroup([]);
+    
+    map.attributionControl.setPrefix('Grossular ศูนย์ภูมิสารสนเทศเพื่อการจัดการต้นน้ำน่าน &middot Leaflet &middot OpenStreetMap');
+    
+    //สเกล
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    }).addTo(map);
+    
+    L.control.scale().addTo(map); 
+
+    function notixxx (feature, layer) {
+                var popupContent = '' + (feature.properties['DESC_'] !== null ? autolinker.link(feature.properties['DESC_'].toLocaleString()) : '') + '';
+                layer.bindPopup(popupContent, {maxHeight: 400});
+            }
+    '<% for (var i = 0; i < data.length; i++) { %>'
+
+    map.createPane('pane<%- data[i].idkey %>');
+    map.getPane('pane<%- data[i].idkey %>').style.zIndex = 400;
+    
+    
+    var itemxxx = new L.geoJson(<%- data[i].jsondata %>, {
+    interactive: true,
+    onEachFeature: notixxx
+    
+    ,style: {
+        pane: 'pane<%- data[i].idkey %>',
+        opacity: 1,
+        color: '<%- data[i].color %>',
+        weight: 15.0,
+        fillOpacity: 0.5,
+        interactive: true,
+    }
+
+    ,pointToLayer: function (feature, latlng) {
+        var context = {
+            feature: feature,
+            variables: {}
+        };
+        return L.circleMarker(latlng, style<%- data[i].idkey %> (feature));
+    },
+
+    }).addTo(map);
+
+    function style<%- data[i].idkey %> () {
+        return {
+            radius: 5.0,
+            color: '<%- data[i].color %>',
+            weight: 2.0,
+            fill: true,
+            fillOpacity: 0.5,
+            fillColor: '<%- data[i].color %>',
+            interactive: true,
+        }
+    }
+    '<% } %>'
+</script>
+            
+
+
+<%- include('../layout/footer.ejs')%>

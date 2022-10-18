@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="OGRGeoJSON" id="OGRGeoJSON">
+	<SimpleField name="id" type="int"></SimpleField>
+	<SimpleField name="off_name" type="string"></SimpleField>
+	<SimpleField name="act_name" type="string"></SimpleField>
+	<SimpleField name="year" type="string"></SimpleField>
+	<SimpleField name="amount" type="int"></SimpleField>
+	<SimpleField name="amount_pln" type="string"></SimpleField>
+	<SimpleField name="note" type="string"></SimpleField>
+	<SimpleField name="DESC_" type="string"></SimpleField>
+</Schema>
+<Folder><name>OGRGeoJSON</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#OGRGeoJSON">
+		<SimpleData name="id">0</SimpleData>
+		<SimpleData name="off_name">หน่วยจัดการต้นน้ำขุนน่าน</SimpleData>
+		<SimpleData name="act_name">จุดก่อสร้างฝาย</SimpleData>
+		<SimpleData name="year">2565</SimpleData>
+		<SimpleData name="amount">1</SimpleData>
+		<SimpleData name="amount_pln">1</SimpleData>
+		<SimpleData name="note"></SimpleData>
+		<SimpleData name="DESC_">หน่วยจัดการต้นน้ำขุนน่าน_จุดก่อสร้างฝาย_2565_1</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>100.930933,18.332622</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="OGRGeoJSON" id="OGRGeoJSON">
+	<SimpleField name="id" type="int"></SimpleField>
+	<SimpleField name="off_name" type="string"></SimpleField>
+	<SimpleField name="act_name" type="string"></SimpleField>
+	<SimpleField name="year" type="int"></SimpleField>
+	<SimpleField name="amount" type="int"></SimpleField>
+	<SimpleField name="amount_pln" type="int"></SimpleField>
+	<SimpleField name="note" type="string"></SimpleField>
+	<SimpleField name="DESC_" type="string"></SimpleField>
+</Schema>
+<Folder><name>OGRGeoJSON</name>
+  <Placemark>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+	<ExtendedData><SchemaData schemaUrl="#OGRGeoJSON">
+		<SimpleData name="id">0</SimpleData>
+		<SimpleData name="off_name">หน่วยจัดการต้นน้ำน้ำกาด</SimpleData>
+		<SimpleData name="act_name">แปลงปลูกไม้ใช้สอย</SimpleData>
+		<SimpleData name="year">2565</SimpleData>
+		<SimpleData name="amount">590</SimpleData>
+		<SimpleData name="amount_pln">1000</SimpleData>
+		<SimpleData name="note"></SimpleData>
+		<SimpleData name="DESC_">หน่วยจัดการต้นน้ำน้ำกาด_แปลงปลูกไม้ใช้สอย_2565_1000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Polygon><outerBoundaryIs><LinearRing><coordinates>100.523624,18.276674,0 100.520205,18.275038,0 100.519495,18.275346,0 100.518723,18.274141,0 100.508852,18.27333,0 100.497605,18.271412,0 100.522327,18.280663,0 100.525417,18.287512,0 100.523624,18.276674,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
+  </Placemark>
+</Folder>
+</Document></kml>

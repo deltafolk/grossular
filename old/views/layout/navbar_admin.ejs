@@ -1,0 +1,42 @@
+<body class="" style='background-color:#EEEEEE; '>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+
+    <div class="container">
+        <p class="nav-band text-white h2"><a href='http://gisnan.ddnsthailand.com:8080'><img src='images/logo1.svg' height='40px' width='190px'></a></p>
+
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navTogg">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navTogg">
+        <ul class="navbar-nav">
+            <li class='nav-item dropdown text-center'>
+                <a class='nav-link dropdown-toggle' href='#' id='navbarDropdownMenuLink' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                ตั้งค่าระบบ
+                </a>
+                <div class='dropdown-menu' aria-labelledby='navbarDropdownMenuLink'>
+                    <a class='dropdown-item' href='/user_manage'>จัดการบัญชีผู้ใช้</a>
+                    <a class='dropdown-item' href='/database_manage'>จัดการฐานข้อมูลหลัก</a>
+                    <a class='dropdown-item' href='/act_manage'>จัดการกิจกรรมแผนงบประมาณ</a>
+                    <a class='dropdown-item' onclick="clearConfirm()">ล้างข้อมูลในแคช</a>
+                    <a class='dropdown-item' href='#'>รายงานข้อผิดพลาด</a>
+                </div>
+            </li>
+            <li class='nav-item'><a href='/userdata' class='nav-link btn btn-dark'>ข้อมูลของผู้ใช้</a></li>
+            <li class='nav-item'><a href='/admin' class='nav-link btn btn-dark'>รายงานการใช้งานระบบ</a></li>
+            <li class='nav-item'><a href='/logout' class='nav-link btn btn-dark'>ออกจากระบบ</a></li>
+        </ul>
+        </div>
+
+    </div>
+</nav>
+
+<script>
+    function clearConfirm() {
+        if (confirm('ล้างข้อมูลทั้งหมดในแคช ดำเนินการต่อหรือไม่') == true) {
+            window.location.href = '/clear_cache';
+        } 
+        else {
+        }
+    }
+</script>

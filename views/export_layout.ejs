@@ -1,0 +1,275 @@
+<%- include('layout/head.ejs')%>
+<%- include('layout/navbar.ejs')%>
+
+
+
+
+<!-- <%= JSON.stringify(arr_jsondata) %><br><br>
+<%= JSON.stringify(data) %><br><br>
+<%= JSON.stringify(loginresult) %><br><br>
+<%= JSON.stringify(coordinates) %> -->
+
+
+<div id="map_choose" style="">
+    <div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow border" style="height: auto; width: 100%;">
+<p class='text-center h5 pt-3'><img src='images/map.svg' height='40px' width='40px'><b><u> สร้างแผนที่ใหม่</u></b></p>
+
+   
+<div class='text-center'><a class='btn btn-light button-primary-override my-3' onclick='choosemap(1)'><img src='images/map01.svg' height='240px' width='180px'><br><b>แผนที่อย่างง่าย</b></a><br>
+    <div class='ps-2' style='font-size:12px; color:#888888;'><u>แผนที่อย่างง่าย</u> เป็นแผนที่ที่จัดวางวัตถุต่างๆ ภายในแผนที่แบบเต็มหน้ากระดาษ มีแผนที่ดัชนี (index map)<br> และสามารถเลือกให้สามารถเข้าถึงข้อมูลได้ด้วย QR CODE</div></div><br>
+<div class='text-center'><a class='btn btn-light button-primary-override my-3' onclick='choosemap(2)'><img src='images/map02.svg' height='240px' width='180px'><br><b>แผนที่สำหรับทำรายงาน</b></a><br>
+    <div class='ps-2' style='font-size:12px; color:#888888;'><u>แผนที่สำหรับทำรายงาน</u> เป็นแผนที่ที่จัดวางวัตถุต่างๆ ภายในแผนที่แบบเว้นว่างด้านล่าง เพื่อให้สามารถใส่รายละเอียดต่างๆ เองได้<br>เช่น ลายเซ็นต์ หรือข้อความกำกับอื่นๆ ภายใน Microsoft word</div></div><br>
+</div>
+</div>
+<%- include('layout/footer.ejs')%>
+</div>
+
+
+<div id="map_detail" style="">
+    <div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow border" style="height: auto; width: 100%;">
+<p class='text-center h5 pt-3'><img src='images/map.svg' height='40px' width='40px'><b><u id="head"> สร้างแผนที่ใหม่</u></b></p>
+
+<form class="text-start" action="/export_map" method="POST">
+    <div class='p-2'>
+    <div class="px-0 py-2"><b>ส่วนหัวของแผนที่ (ไม่เกิน 4 บรรทัด) <span style='color: red' id="count_nl"> - </span></b></div>
+
+    <textarea id='header' class='form-control' rows="3" cols=15 name='title' maxlength='250' oninput="count_break()">แผนที่แสดง<%=data.actname %> จำนวน <%=data.amount %> <% if (data.type == 'point') { %>แห่ง<% } else if (data.type == 'line') { %>กิโลเมตร<% } else { %>ไร่<% } %> ประจำปีงบประมาณ พ.ศ.<%=data.year %>
+<%=data.offname %> <%= loginresult.address %></textarea>
+
+<div class="px-0 pt-3"><b>เลือกแผนที่ภูมิประเทศ</b></div>
+
+<div class="px-3">
+    <div class="p-1">
+    <input type="radio" name="topo_m" class="form-check-input" value="01" checked> กรมแผนที่ทหาร ลำดับชุด L7018<br>
+    </div>
+</div>
+
+    <div class="px-0 pt-3"><b>เลือกภาพถ่ายทางอากาศ</b></div>
+
+    <div class="px-3">
+        <div class="p-1">
+        <input type="radio" name="ortho_m" class="form-check-input" value="01" checked onclick="hide_other()"> ภายถ่ายดาวเทียมไทยโซต พ.ศ.2562<br>
+        </div>
+        <div class="p-1">
+        <input type="radio" name="ortho_m" class="form-check-input" value="02" onclick="hide_other()"> ภายถ่ายทางอากาศ กรมพัฒนาที่ดิน พ.ศ.2555<br>
+        </div>
+        <div class="p-1">
+        <input type="radio" name="ortho_m" class="form-check-input" value="03" onclick="hide_other()"> ภายถ่ายทางอากาศ กรมพัฒนาที่ดิน พ.ศ.2545<br>
+        </div>
+        <div class="p-1">
+        <input type="radio" name="ortho_m" class="form-check-input" value="04" onclick="show_other()"> อื่นๆ (ใช้ XYZ tile จากแหล่งอื่น)<br>
+
+        <div id='other_map' class="row px-3 py-2 align-items-center" style="display:none">
+            <div class="col-auto">
+              <label class="col-form-label">ชื่อแผนที่</label>
+            </div>
+            <div class="col-auto">
+                <input type='textbox' name='orthoname' maxlength='30' class='form-control' value="ภาพถ่ายทางอากาศ">
+            </div>
+            <div class="col-auto">
+                <label class="col-form-label">URL ของ XYZ tile</label>
+            </div>
+            <div class="col-auto">
+                <input type='textbox'  name='orthourl' class='form-control' style='width:100%' value="http://a.tile.openstreetmap.org/{z}/{x}/{y}.png">
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+
+    <div class="px-0 py-2"><b>ส่วนของคำอธิบายสัญลักษณ์ (สามารถแก้ไขได้)</b></div>
+
+    <div id='legend-1' class="bg-light p-2 rounded-3 border" style="height: auto; width: 100%; min-height:210px;">
+    <table style="font-size:14px">
+        <tr>
+            <td style='width:400px'>
+                <div class="input-group p-0">
+                    <div class="input-group-prepend"><span class="input-group-text"><img src="images/legend/<%= data.type%>1.svg"></span>
+                    </div>
+                    <input class="form-control" type="text" maxlength="40" name="legend" value="<%= data.actname %>">
+                </div>
+            </td>
+            <td style='width:400px'></td>
+        </tr>
+    </table>
+    </div>
+
+    <div id='legend-2' class="bg-light p-2 rounded-3 border" style="height: auto; width: 100%; min-height:210px;">
+        <table style="font-size:14px">
+        <% if (arr_jsondata.length != 1) { %>
+        <% if (arr_jsondata[0].features.length < 2) { %>
+            <% for (var i = 0; i < arr_jsondata.length; i=i+2) { %>
+            <tr>
+                <% if (typeof arr_jsondata[i] != 'undefined') { %>
+                <td style='width:400px'>
+                    <div class="input-group p-0">
+                        <div class="input-group-prepend"><span class="input-group-text"><img src="images/legend/<%= data.type%><%= i+1%>.svg"></span>
+                        </div>
+                        <input class="form-control" type="text" maxlength="40" name="legend" value="<% if (data.type == 'point') { %>จุดที่<% } else if (data.type == 'line') { %>เส้นที่<% } else { %>แปลงที่<% } %> <%= i+1%> จำนวน <%= arr_jsondata[i].features[0].properties.amount %> <% if (data.type == 'point') { %>แห่ง<% } else if (data.type == 'line') { %>กม.<% } else { %>ไร่<% } %>">
+                    </div>
+                </td>
+                <% } %>
+                <% if (typeof arr_jsondata[i+1] != 'undefined') { %>
+                <td style='width:400px'>
+                    <div class="input-group p-0">
+                        <div class="input-group-prepend"><span class="input-group-text"><img src="images/legend/<%= data.type%><%= i+2%>.svg"></span>
+                        </div>
+                        <input class="form-control" type="text" maxlength="40" name="legend" value="<% if (data.type == 'point') { %>จุดที่<% } else if (data.type == 'line') { %>เส้นที่<% } else { %>แปลงที่<% } %> <%= i+2%> จำนวน <%= arr_jsondata[i+1].features[0].properties.amount %> <% if (data.type == 'point') { %>แห่ง<% } else if (data.type == 'line') { %>กม.<% } else { %>ไร่<% } %>">
+                    </div>
+                </td>
+                <% } %>
+            </tr>
+            <% } %>
+        <% } else { %>
+            <div class='alert alert-primary p-2 mx-0 my-2 text-center'><i class="fa fa-info-circle" aria-hidden="true"></i> ข้อมูลถูกจัดรูปแบบใหม่เป็นคู่ เพื่อให้คำอธิบายสัญลักษณ์ไม่เกิน 10 รูปแบบ</div> 
+
+            <% for (var i = 0; i < arr_jsondata.length; i=i+2) { %>
+            <tr>
+                <% if (typeof arr_jsondata[i] != 'undefined') { %>
+                <td style='width:400px'>
+                    <div class="input-group p-0">
+                        <div class="input-group-prepend"><span class="input-group-text"><img src="images/legend/<%= data.type%><%= i+1%>.svg"></span>
+                        </div>
+                        <input class="form-control" type="text" maxlength="40" name="legend" value="<% if (data.type == 'point') { %>จุดที่<% } else if (data.type == 'line') { %>เส้นที่<% } else { %>แปลงที่<% } %> <%= i+1%> จำนวน <%if (arr_jsondata[i].features[1] != null) { %><%= arr_jsondata[i].features[0].properties.amount + arr_jsondata[i].features[1].properties.amount %><%} else { %><%= arr_jsondata[i].features[0].properties.amount %><% } %> <% if (data.type == 'point') { %>แห่ง<% } else if (data.type == 'line') { %>กม.<% } else { %>ไร่<% } %>">
+                    </div>
+                </td>
+                <% } %>
+                <% if (typeof arr_jsondata[i+1] != 'undefined') { %>
+                <td style='width:400px'>
+                    <div class="input-group p-0">
+                        <div class="input-group-prepend"><span class="input-group-text"><img src="images/legend/<%= data.type%><%= i+2%>.svg"></span>
+                        </div>
+                        <input class="form-control" type="text" maxlength="40" name="legend" value="<% if (data.type == 'point') { %>จุดที่<% } else if (data.type == 'line') { %>เส้นที่<% } else { %>แปลงที่<% } %> <%= i+2%> จำนวน <%= arr_jsondata[i+1].features[0].properties.amount + arr_jsondata[i].features[1].properties.amount %> <% if (data.type == 'point') { %>แห่ง<% } else if (data.type == 'line') { %>กม.<% } else { %>ไร่<% } %>">
+                    </div>
+                </td>
+                <% } %>
+            </tr>
+            <% } %>
+        <% } %>
+        <% } else { %>
+        <% } %>
+        </table>
+    </div>
+
+    <% if (arr_jsondata.length != 1) { %>
+    <div class="form-check text-start px-4 pt-2">
+        <input class="form-check-input" type="checkbox" id='check_legend' name='check_legend' value='1'>
+            <label class="form-check-label text-start">
+                คำอธิบายแบบแยกตามแถวของข้อมูล (Categorized)<span style="color:#545454; font-size:12px"> (ข้อมูลจะถูกแยกตามแถว และให้สีโดยอัตโนมัติ หากข้อมูลดังกล่าวมีมากกว่า 10 แถว ข้อมูลจะถูกจัดรูปแบบใหม่เป็นคู่ เพื่อให้คำอธิบายสัญลักษณ์ไม่เกิน 10 รูปแบบ)</span>
+            </label>
+    </div>
+    <% } else { %>
+    <div class='alert alert-secondary p-2 mx-0 my-2 text-center'><i class="fa fa-info-circle" aria-hidden="true"></i> ไม่สามารถแยกข้อมูลตามแถว (Categorized) ได้</div> 
+    <div class="form-check text-start px-4 pt-2">
+        <input class="form-check-input" type="checkbox" id='check_legend' name='check_legend' value='1' disabled>
+            <label class="form-check-label text-start"><i>
+                คำอธิบายแบบแยกตามแถวของข้อมูล (Categorized)<span style="color:#545454; font-size:12px"> (ข้อมูลจะถูกแยกตามแถว และให้สีโดยอัตโนมัติ หากข้อมูลดังกล่าวมีมากกว่า 10 แถว ข้อมูลจะถูกจัดรูปแบบใหม่เป็นคู่ เพื่อให้คำอธิบายสัญลักษณ์ไม่เกิน 10 รูปแบบ)</span>
+            </i></label>
+    </div>
+    <% } %>
+    <div class="form-check text-start px-4 py-2">
+        <input class="form-check-input" type="checkbox" id="qrcode" name='qrcode' value='1'>
+            <label class="form-check-label text-start">
+                อนุญาตให้เข้าถึงข้อมูลนี้ได้ ด้วย QR-CODE บนแผนที่
+            </label>
+    </div>
+
+</div>
+</div>
+</div>
+
+<br>
+    <div class='pt-2 text-center'><input type="submit" class="btn btn-warning" id='next' value="ถัดไป">
+
+    </div>
+
+<input type="hidden" name="jsondata" value="<%= JSON.stringify(arr_jsondata) %>">
+<input type="hidden" name="raw_jsondata" value="<%= (data.jsondata) %>">
+<input type="hidden" name="logindata" value="<%= JSON.stringify(loginresult) %>">
+<input type="hidden" name="coordinates" value="<%= JSON.stringify(coordinates) %>">
+<input type="hidden" name="typeinput" value="<%= (data.type) %>">
+<input type="hidden" name="publickey" value="<%= (data.publickey) %>">
+<input id='maptype' type="hidden" name="maptype" value="01">
+
+</form>
+</div>
+</div>
+
+<script type="text/javascript">
+    $("#legend-2").hide();
+    $("#check_legend").click(function() {
+        if($(this).is(":checked")) {
+            $("#legend-2").show();
+            $("#legend-1").hide();
+        } else {
+            $("#legend-2").hide();
+            $("#legend-1").show();
+        }
+    });
+</script>
+
+<script>
+    function show_other(){
+        document.getElementById('other_map').style.display ='';
+    }
+    function hide_other(){
+        document.getElementById('other_map').style.display ='none';
+    }
+</script>
+
+<script type="text/javascript">
+    $("#map_detail").hide();
+
+    function choosemap(type) {
+
+    let map_choose = document.getElementById("map_choose");
+    let map_detail = document.getElementById("map_detail");
+
+    if (type == 1) {
+        map_choose.style.display = "none";
+        map_detail.style.display = "block";
+        document.getElementById('maptype').value = '01';
+        document.getElementById("head").innerHTML = "สร้างแผนที่อย่างง่าย";
+    } 
+    else if (type == 2) {
+        map_choose.style.display = "none";
+        map_detail.style.display = "block";
+        document.getElementById('maptype').value = '02';
+        document.getElementById("head").innerHTML = "สร้างแผนที่สำหรับทำรายงาน";
+        document.getElementById("qrcode").disabled = true;
+    }
+}
+
+const count_nl = document.getElementById("count_nl");
+const headerx = document.getElementById("header");
+let match = headerx.value.match(/[^\n]*\n[^\n]*/gi);
+if (match === null){
+    match = 1
+} else {
+    match = match.length + 1
+}
+
+count_nl.innerHTML = "คงเหลือ " + (4-match) + " บรรทัด"
+
+function count_break(){
+    const count_nl = document.getElementById("count_nl");
+    const headerx = document.getElementById("header");
+    let match = headerx.value.match(/[^\n]*\n[^\n]*/gi);
+    if (match === null){
+        match = 1
+    } else {
+        match = match.length + 1
+    }
+
+    count_nl.innerHTML = "คงเหลือ " + (4-match) + " บรรทัด"
+}
+
+</script>
+
+
+
+
+<%- include('layout/footer.ejs')%>

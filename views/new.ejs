@@ -1,0 +1,348 @@
+<%- include('layout/head.ejs')%>
+<%- include('layout/navbar.ejs')%>
+
+
+
+<!-- ส่วนของเลือกชนิดข้อมูล -->
+<div id="type_sel" style="">
+<div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow border" style="height: auto; width: 100%;">
+        <div class="text-end p-3">
+    </div>
+    <p class='text-center h5 p-3'><img src='images/layer.svg' height='40px' width='40px'><b><u> เพิ่มข้อมูล</u></b></p>
+    <div class='row'>
+    <div class="col-sm-3"></div>
+    <div class="col-sm-8">    
+    <div class='text-start'><a class='btn btn-light button-primary-override my-3' onclick='chooseItem("point")'><img src='images/point.svg' height='40px' width='40px'> &nbsp ข้อมูลแบบจุด (Point)</a><br><div class='ps-2' style='font-size:12px; color:#888888;'><u>ข้อมูลแบบจุด</u> เช่น จุดก่อสร้างฝาย จุดอาคารและสิ่งปลูกสร้าง ตำแหน่งหมู่บ้าน</div></div><br>
+    <div class='text-start'><a class='btn btn-light button-primary-override my-3' onclick='chooseItem("line")'><img src='images/line.svg' height='40px' width='40px'> &nbsp ข้อมูลแบบเส้น (Line)</a><br><div class='ps-2' style='font-size:12px; color:#888888;'><u>ข้อมูลแบบเส้น</u> เช่น เส้นแนวกันไฟ เส้นทางคมนาคม เส้นทางน้ำ</div></div><br>
+    <div class='text-start'><a class='btn btn-light button-primary-override my-3' onclick='chooseItem("polygon")'><img src='images/polygon.svg' height='40px' width='40px'> &nbsp ข้อมูลแบบรูปปิด (Polygon)</a><br><div class='ps-2' style='font-size:12px; color:#888888;'><u>ข้อมูลแบบรูปปิด</u> เช่น แปลงปลูก พื้นที่ของอาคารและสิ่งปลูกสร้าง แหล่งน้ำ</div></div><br>
+    </div>
+    <div class="col-sm-1"></div>
+    </div>
+    <br>
+    <div style="margin-left:auto; margin-right:auto;"></div>
+</div>
+</div>
+</div>
+
+<!-- ส่วนของข้อมูลแบบ point -->
+<div id="point_sel" style="display:none;">
+<div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow border" style="height: auto; width: 100%; ">
+        <div class="text-end p-3">
+    </div>
+    <p class='text-center h5 p-3'><img src='images/point.svg' height='40px' width='40px'><b><u>เพิ่มข้อมูลจุด (Point)</u></b></p>
+    <form class="text-center" action='/check_newData/point' method="POST" id="formPoint">
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">ชื่อหน่วยงาน</span></div>
+            <select class='form-select' name='off' required>
+                <% Object.values(offdata).forEach(function(item) {%>
+                <option value='<%=item.loginkey %>'><%=item.off %></option>
+                <% }) %>
+            </select>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">ชื่อกิจกรรม</span></div>
+            <select class='form-select' name='act' required>
+                <% Object.values(actdata).forEach(function(item) {%>
+                <% if (item.acttype == 'point') { %>
+                    <option value='<%=item.actkey %>'><%=item.actname %></option>
+                <% } else { %>  
+                <% } %>
+                <% }) %>
+            </select>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">ปีงบประมาณ พ.ศ.</span></div>
+            <select class='form-select' name='year' required>
+                <% for(var i=0; i < year.length; i++) { %>
+                <option value='<%= year[i] %>' <% if (i == 2) { %> selected <% } %>><%= year[i] %></option>
+                <% } %>
+            </select>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">จำนวนตามงบประมาณที่ได้รับ (แห่ง)</span></div>
+            <input class="form-control" type="number" min='1' maxlength="6" name="amount" required>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">หมายเหตุ</span></div>
+            <input class="form-control" type="text" maxlength="60"  name="note" placeholder="(ถ้ามี)" pattern="[A-Za-z0-9ก-๙]+">
+        </div>
+        <div class="form-check text-start m-2">
+                <input class="form-check-input" type="checkbox" id='check_xy_point' name='check_xy' value='1'>
+                    <label class="form-check-label text-start">
+                        มีจุดพิกัดอ้างอิง จากการสำรวจภาคสนาม (กรอกแยกพิกัด X พิกัด Y โดยพิกัดแต่ละค่าคั่นด้วย "ช่องว่าง" หรือคัดลอกมาจาก Excel)
+                    </label>
+        </div>
+        <div class='p-2' id='add_xy_point'>
+                <table style="width:100%">
+                    <th style="width:50%"><div class="text-center"><u>พิกัด X</u></div></th>
+                    <th style="width:50%"><div class="text-center"><u>พิกัด Y</u></div></th>
+                    <tr>
+                        <td><textarea class='form-control' rows="3" cols=15 name='px' placeholder="ตัวอย่าง: 601023 601080 601120"></textarea></td>
+                        <td><textarea class='form-control' rows="3" cols=15 name='py' placeholder="ตัวอย่าง: 2012023 2012055 2012097"></textarea></td>
+                    </tr>
+                </table>
+                <div class="form-check text-start my-2">
+                    <input class="form-check-input" type="checkbox" id="auto_d" name='auto_d' value='1'>
+                        <label class="form-check-label text-start">
+                            Digitized หมุดอัตโนมัติ (หากไม่เลือกส่วนนี้ หมุดพิกัดจะถูกใช้เป็นหมุดอ้างอิงแทน)
+                        </label>
+                </div>
+        </div>
+    
+    <div class='text-center'>
+        <div class='p-2'><button onclick="doSubmit('formPoint')" class="btn btn-warning">ถัดไป</button>
+        <a class="btn btn-secondary" onclick="chooseItem('')">ย้อนกลับ</a>
+    </div>
+            
+    </form>
+    </div>
+</div>
+</div>
+</div>
+
+
+<!-- ส่วนของข้อมูลแบบ line -->
+<div id="ppp" style="display:none;">
+<div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow border" style="height: auto; width: 100%;">
+        <div class="text-end p-3">
+    </div>
+    <p class='text-center h5 p-3'><img src='images/line.svg' height='40px' width='40px'><b><u>เพิ่มข้อมูลเส้น (Line)</u></b></p>
+    <form class="text-center" action='/check_newData/line' method="POST" id="'formLine">
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">ชื่อหน่วยงาน</span></div>
+            <select class='form-select' name='off' required>
+                <% Object.values(offdata).forEach(function(item) {%>
+                <option value='<%=item.loginkey %>'><%=item.off %></option>
+                <% }) %>
+            </select>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">ชื่อกิจกรรม</span></div>
+            <select class='form-select' name='act' required>
+                <% Object.values(actdata).forEach(function(item) {%>
+                <% if (item.acttype == 'line') { %>
+                    <option value='<%=item.actkey %>'><%=item.actname %></option>
+                <% } else { %>  
+                <% } %>
+                <% }) %>
+            </select>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">ปีงบประมาณ พ.ศ.</span></div>
+            <select class='form-select' name='year' required>
+                <% for(var i=0; i < year.length; i++) { %>
+                    <option value='<%= year[i] %>' <% if (i == 2) { %> selected <% } %>><%= year[i] %></option>
+                <% } %>
+            </select>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">จำนวนตามงบประมาณที่ได้รับ (กิโลเมตร)</span></div>
+            <input class="form-control" type="number" min='1' maxlength="6" name="amount" required>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">หมายเหตุ</span></div>
+            <input class="form-control" type="text" maxlength="60"  name="note" placeholder="(ถ้ามี)" pattern="[A-Za-z0-9ก-๙]+">
+        </div>
+        <div class="form-check text-start m-2">
+                <input class="form-check-input" type="checkbox" id='check_xy_line' name='check_xy' value='1'>
+                    <label class="form-check-label text-start">
+                        มีจุดพิกัดอ้างอิง จากการสำรวจภาคสนาม (กรอกแยกพิกัด X พิกัด Y โดยพิกัดแต่ละค่าคั่นด้วย "ช่องว่าง" หรือคัดลอกมาจาก Excel)
+                    </label>
+        </div>
+        <div class='p-2' id='add_xy_line'>
+                <table style="width:100%">
+                    <th style="width:50%"><div class="text-center"><u>พิกัด X</u></div></th>
+                    <th style="width:50%"><div class="text-center"><u>พิกัด Y</u></div></th>
+                    <tr>
+                        <td><textarea class='form-control' rows="3" cols=15 name='px' placeholder="ตัวอย่าง: 601023 601080 601120"></textarea></td>
+                        <td><textarea class='form-control' rows="3" cols=15 name='py' placeholder="ตัวอย่าง: 2012023 2012055 2012097"></textarea></td>
+                    </tr>
+                </table>
+                <div class="form-check text-start my-2">
+                    <input class="form-check-input" type="checkbox" id="auto_d" name='auto_d' value='1'>
+                        <label class="form-check-label text-start">
+                            Digitized หมุดอัตโนมัติ (หากไม่เลือกส่วนนี้ หมุดพิกัดจะถูกใช้เป็นหมุดอ้างอิงแทน)
+                        </label>
+                </div>
+        </div>
+    
+    <div class='text-center'>
+        <div class='p-2'><button onclick="doSubmit('formLine')" class="btn btn-warning">ถัดไป</button>
+        <a class="btn btn-secondary" onclick="chooseItem('')">ย้อนกลับ</a>
+    </div>
+            
+    </form>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- ส่วนของข้อมูลแบบ polygon -->
+<div id="polygon_sel" style="display:none;">
+<div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow border" style="height: auto; width: 100%;">
+        <div class="text-end p-3">
+    </div>
+    <p class='text-center h5 p-3'><img src='images/polygon.svg' height='40px' width='40px'><b><u>เพิ่มข้อมูลรูปร่าง (Polygon)</u></b></p>
+    <form class="text-center" action='/check_newData/polygon' method="POST" id="formPolygon">
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">ชื่อหน่วยงาน</span></div>
+            <select class='form-select' name='off' required>
+                <% Object.values(offdata).forEach(function(item) {%>
+                <option value='<%=item.loginkey %>'><%=item.off %></option>
+                <% }) %>
+            </select>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">ชื่อกิจกรรม</span></div>
+            <select class='form-select' name='act' required>
+                <% Object.values(actdata).forEach(function(item) {%>
+                <% if (item.acttype == 'polygon') { %>
+                    <option value='<%=item.actkey %>'><%=item.actname %></option>
+                <% } else { %>  
+                <% } %>
+                <% }) %>
+            </select>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">ปีงบประมาณ พ.ศ.</span></div>
+            <select class='form-select' name='year' required>
+                <% for(var i=0; i < year.length; i++) { %>
+                    <option value='<%= year[i] %>' <% if (i == 2) { %> selected <% } %>><%= year[i] %></option>
+                <% } %>
+            </select>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">จำนวนตามงบประมาณที่ได้รับ (ไร่)</span></div>
+            <input class="form-control" type="number" min='1' maxlength="6" name="amount" required>
+        </div>
+        <div class="input-group p-2">
+            <div class="input-group-prepend"><span class="input-group-text">หมายเหตุ</span></div>
+            <input class="form-control" type="text" maxlength="60"  name="note" placeholder="(ถ้ามี)" pattern="[A-Za-z0-9ก-๙]+">
+        </div>
+        <div class="form-check text-start m-2">
+                <input class="form-check-input" type="checkbox" id='check_xy_polygon' name='check_xy' value='1'>
+                    <label class="form-check-label text-start">
+                        มีจุดพิกัดอ้างอิง จากการสำรวจภาคสนาม (กรอกแยกพิกัด X พิกัด Y โดยพิกัดแต่ละค่าคั่นด้วย "ช่องว่าง" หรือคัดลอกมาจาก Excel)
+                    </label>
+        </div>
+        <div class='p-2' id='add_xy_polygon'>
+                <table style="width:100%">
+                    <th style="width:50%"><div class="text-center"><u>พิกัด X</u></div></th>
+                    <th style="width:50%"><div class="text-center"><u>พิกัด Y</u></div></th>
+                    <tr>
+                        <td><textarea class='form-control' rows="3" cols=15 name='px' placeholder="ตัวอย่าง: 601023 601080 601120"></textarea></td>
+                        <td><textarea class='form-control' rows="3" cols=15 name='py' placeholder="ตัวอย่าง: 2012023 2012055 2012097"></textarea></td>
+                    </tr>
+                </table>
+                <div class="form-check text-start my-2">
+                    <input class="form-check-input" type="checkbox" id="auto_d" name='auto_d' value='1'>
+                        <label class="form-check-label text-start">
+                            Digitized หมุดอัตโนมัติ (หากไม่เลือกส่วนนี้ หมุดพิกัดจะถูกใช้เป็นหมุดอ้างอิงแทน)
+                        </label>
+                </div>
+        </div>
+    
+    <div class='text-center'>
+        <div class='p-2'><button onclick="doSubmit('formPolygon')" class="btn btn-warning">ถัดไป</button>
+        <a class="btn btn-secondary" onclick="chooseItem('')">ย้อนกลับ</a>
+    </div>
+            
+    </form>
+</div>
+</div>
+</div>
+</div>
+
+
+<script>
+    function cancelConfirm() {
+    if (confirm('ข้อมูลจะไม่ถูกบันทึก ดำเนินการต่อหรือไม่?') == true) {
+        window.location.href = '/home';
+    } 
+    else {
+    }
+}
+    function chooseItem(type) {
+
+
+        let items_type = document.getElementById("type_sel");
+        let items_point = document.getElementById("point_sel");
+        let items_line = document.getElementById("ppp");
+        let items_polygon = document.getElementById("polygon_sel");
+
+        if (type == "point") {
+            items_type.style.display = "none";
+            items_point.style.display = "";
+            items_line.style.display = "none";
+            items_polygon.style.display = "none";
+        } 
+        else if (type == "line") {
+            items_type.style.display = "none";
+            items_point.style.display = "none";
+            items_line.style.display = "";
+            items_polygon.style.display = "none";
+
+        }
+        else if (type == "polygon"){
+            items_type.style.display = "none";
+            items_point.style.display = "none";
+            items_line.style.display = "none";
+            items_polygon.style.display = "";
+        }
+        else {
+            items_type.style.display = "";
+            items_point.style.display = "none";
+            items_line.style.display = "none";
+            items_polygon.style.display = "none";
+        }
+    }
+</script>
+
+
+<script type="text/javascript">
+    $("#add_xy_point").hide();
+    $("#add_xy_line").hide();
+    $("#add_xy_polygon").hide();
+
+    $("#check_xy_point").click(function() {
+        if($(this).is(":checked")) {
+            $("#add_xy_point").show();
+        } else {
+            $("#add_xy_point").hide();
+        }
+    });
+
+    $("#check_xy_line").click(function() {
+        if($(this).is(":checked")) {
+            $("#add_xy_line").show();
+        } else {
+            $("#add_xy_line").hide();
+        }
+    });
+
+    $("#check_xy_polygon").click(function() {
+        if($(this).is(":checked")) {
+            $("#add_xy_polygon").show();
+        } else {
+            $("#add_xy_polygon").hide();
+        }
+    });
+</script>
+<script>
+    function doSubmit(idform){
+
+        if (confirm('โปรดรอขณะเตรียมฐานข้อมูล... ดำเนินการต่อหรือไม่') == true) {
+            document.getElementById(idform).submit();
+        }
+        else {
+        }
+
+    }
+
+</script>
+<%- include('layout/footer.ejs')%>

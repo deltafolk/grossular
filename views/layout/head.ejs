@@ -1,0 +1,181 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grossular ศูนย์ภูมิสารสนเทศเพื่อการจัดการต้นน้ำน่าน</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    
+    <script src="../js/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.js"></script>
+
+    <script type='text/javascript' src='https://d3js.org/d3.v3.min.js'></script>
+    <script type='text/javascript' src='https://d3js.org/topojson.v1.min.js'></script>
+    <script type='text/javascript' src='https://cdn.rawgit.com/BinaryMuse/planetary.js/v1.1.2/dist/planetaryjs.min.js'></script>
+    
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <script src="../js/Leaflet.Graticule.js"></script>
+    <script src="https://unpkg.com/@turf/turf"></script>
+    <script src='../js/amount_calculate.js'></script>
+    <link rel="stylesheet" href="../css/leaflet.zoomhome.css"/>
+    <script src="../js/leaflet.zoomhome.min.js"></script>
+
+    <link rel="stylesheet" href="../css/Control.FullScreen.css" />
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+
+    <link rel="stylesheet" href="../css/leaflet.draw.css"/>
+    <script src="../js/leaflet.draw.js"></script>
+    <script src="../js/leaflet.draw.tooltip.js"></script>
+
+    <script src="../js/leaflet-hash.js"></script>
+    <script src="../js/Autolinker.min.js"></script>
+    <script src="../js/filesaver.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css" />  
+    <script src="../js/leaflet-geoman.min.js"></script>
+
+
+</head>
+<style>
+    .tutorial {
+        display: none
+    }
+    #overlay {
+            position: absolute; /* Sit on top of the page content */
+            display: none; /* Hidden by default */
+            width: 100%; /* Full width (cover the whole page) */
+            height: 100%; /* Full height (cover the whole page) */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.9); /* Black background with opacity */
+            z-index: 10000; /* Specify a stack order in case you're using a different order for other elements */
+            overflow-y: hidden;
+            }
+
+    .fade {
+        animation-name: fade;
+        animation-duration: 1.5s;
+    }
+    .button-primary-override:hover{
+        background-color: #d9e2ef  !important;
+    }
+    
+    textarea { resize:none; }
+
+    .hiddentextarea {   
+        width: 0px;
+        height: 0px; 
+        background: white;
+        border: none;
+        overflow: auto;
+        outline: none;
+    }
+
+    #map { width: 100%; height: 90%;                 
+        font-family: sans-serif;
+        padding: 0;
+        margin: 0;
+    font-size: 12px;
+    }
+    #maptopo1 { 
+        width: 850px; height: 700px;                 
+        font-family: sans-serif;
+        padding: 0;
+        margin: 0;
+        font-size: 12px;
+    }
+    .leaflet-container {
+        background: #FFFFFF;
+        outline: 0;
+    }
+
+    .mapprint { width: auto; height: 30cm;                 
+        font-family: sans-serif;
+        padding: 0;
+        margin: 0;
+        font-size: 12px;
+    }
+    .mapindex { width: 5cm; height: 6cm;                 
+        font-family: sans-serif;
+        padding: 0;
+        margin: 0;
+        font-size: 12px;
+    }
+    .maportho { width: 5cm; height: 6.75cm;                 
+        font-family: sans-serif;
+        padding: 0;
+        margin: 0;
+        font-size: 12px;
+    }
+    .overflow_ {
+        height:450px;
+        overflow-y: scroll;
+    }
+
+    .text_l{
+        writing-mode: vertical-rl;
+        text-orientation: use-glyph-orientation;
+    }
+    .text_r{
+        writing-mode: vertical-rl;
+        text-orientation: use-glyph-orientation;
+        transform: rotate(180deg);
+    }
+    .lefttop{
+        vertical-align: top;
+        text-align: left;
+    }
+    .centertop{
+        vertical-align: top;
+        text-align: center;
+    }
+    .title {
+        line-height: 1.9;
+    }
+    .centercenter{
+        vertical-align: center;
+        text-align: center;
+    }
+    .loader {
+
+    border: 10px solid #eeeeee;
+    border-radius: 100%;
+    border-top: 10px solid #0d6efd;
+    width: 40px;
+    height: 40px;
+    -webkit-animation: spin 3s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
+    
+    .footer{
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+</style>

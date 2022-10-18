@@ -1,0 +1,114 @@
+<%- include('layout/head.ejs')%>
+<%- include('layout/navbar.ejs')%>
+
+
+
+<div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow border" style="height: auto; width: 100%;">
+        <div class="text-end p-3">
+    </div>
+    <p class='text-center h5 p-3'><img src='../images/table.svg' height='40px' width='40px'><b><u> ตารางแสดงค่าพิกัด</u></b></p>
+    <% if (multiCHK == true) { %> 
+        <div class='alert alert-primary p-2 m-2 text-center'><i class="fa fa-info-circle" aria-hidden="true"></i> ข้อมูลนำเข้านี้ เป็นข้อมูลชนิดหลายรูปแบบ (Multi Shape) ข้อมูลจะถูกแยกเป็น "ส่วนที่"</div>
+    <% } %>
+    <div class="px-3">
+    <b>ชื่อกิจกรรม </b> <%= data.actname %><br>
+    <b>ชื่อหน่วยงาน</b> <%= data.offname %><br>
+    <b>ปีงบประมาณ พ.ศ.</b> <%= data.year %><br>
+    <b>จำนวนตามแผนงบประมาณ </b> <%= data.amount %> <% if (data.type == 'point') { %>แห่ง<% } else if (data.type == 'line') { %>กิโลเมตร<% } else { %>ไร่<% } %><br>
+    </div>
+
+    <div class="overflow_ p-3">
+
+    <% if (multiCHK == true) { %> 
+    <table class='table table-hover text-center'>
+        <th><% if (data.type == 'point') { %>จุดที่<% } else if (data.type == 'line') { %>เส้นที่<% } else { %>แปลงที่<% } %></th>
+        <th>ส่วนที่</th>
+        <th>จุดที่</th>
+        <th>พิกัด x</th>
+        <th>พิกัด y</th>
+        <th>โซน</th>
+
+        <% for (var i = 0; i < coordinates.coordinates.length; i++) {%>
+            <tr>
+            <td><%= coordinates.coordinates[i].feature + 1 %></td>
+            <td><%= coordinates.coordinates[i].part + 1 %></td>
+            <td><%= coordinates.coordinates[i].point + 1 %></td>
+            <td><%= coordinates.coordinates[i].x %></td>
+            <td><%= coordinates.coordinates[i].y %></td>
+            <td><%= coordinates.coordinates[i].zone %></td>
+            </tr>
+        <% } %>
+
+        <tr>
+            <td>ค่าพิกัดกลางแปลง</td>
+            <td></td>
+            <td></td>
+            <td><%= coordinates.center_coordinate[0] %></td>
+            <td><%= coordinates.center_coordinate[1] %></td>
+            <td></td>
+        </tr>
+
+    <% } else { %>
+        <table class='table table-hover text-center'>
+        <th><% if (data.type == 'point') { %>จุดที่<% } else if (data.type == 'line') { %>เส้นที่<% } else { %>แปลงที่<% } %></th>
+        <th>จุดที่</th>
+        <th>พิกัด x</th>
+        <th>พิกัด y</th>
+        <th>โซน</th>
+
+        <% for (var i = 0; i < coordinates.coordinates.length; i++) {%>
+            <tr>
+            <td><%= coordinates.coordinates[i].feature + 1 %></td>
+            <td><%= coordinates.coordinates[i].point + 1 %></td>
+            <td><%= coordinates.coordinates[i].x %></td>
+            <td><%= coordinates.coordinates[i].y %></td>
+            <td><%= coordinates.coordinates[i].zone %></td>
+            </tr>
+        <% } %>
+
+        <tr>
+            <td>ค่าพิกัดกลางแปลง</td>
+            <td></td>
+            <td><%= coordinates.center_coordinate[0] %></td>
+            <td><%= coordinates.center_coordinate[1] %></td>
+            <td></td>
+        </tr>
+
+    <% } %>
+
+
+    </table>
+    <div class='blockquote-footer text-start p-2'><small>ค่าพิกัดกลาง คือ ค่ากึ่งกลางพิสัย (mid-range) ของข้อมูลเชิงพื้นที่ใดๆ หรือค่ากึ่งกลางระหว่าง ค่าพิกัดในระนาบแกนที่มากที่สุด(max) ลบด้วยค่าที่น้อยที่สุด(min)</div>
+    </div>
+    </div>
+
+    <textarea id='textareax' class='hiddentextarea'>
+<%= data.actname %>
+<%= data.offname %>
+ประจำปีงบประมาณ พ.ศ.<%= data.year %>
+จำนวน <%= data.amount %> <% if (data.type == 'point') { %>แห่ง<% } else if (data.type == 'line') { %>กิโลเมตร<% } else { %>ไร่<% } %>&#010;
+<% if (multiCHK == true) { %>
+<% if (data.type == 'point') { %>จุดที่<% } else if (data.type == 'line') { %>เส้นที่<% } else { %>แปลงที่<% } %>&#9;ส่วนที่&#9;จุดที่&#9;พิกัด x&#9;พิกัด y&#9;โซน&#010;
+<% } else { %><% if (data.type == 'point') { %>จุดที่<% } else if (data.type == 'line') { %>เส้นที่<% } else { %>แปลงที่<% } %>&#9;จุดที่&#9;พิกัด x&#9;พิกัด y&#9;โซน&#010;<% } %>
+<% for (var i = 0; i < coordinates.coordinates.length; i++) {%><%= coordinates.coordinates[i].feature + 1 %>&#9;<%= coordinates.coordinates[i].part + 1 %>&#9;<%= coordinates.coordinates[i].point + 1 %>&#9;<%= coordinates.coordinates[i].x %>&#9;<%= coordinates.coordinates[i].y %>&#9;<%= coordinates.coordinates[i].zone %>
+<% } %>
+ค่าพิกัดกลางแปลง&#9;<%= coordinates.center_coordinate[0] %>&#9;<%= coordinates.center_coordinate[1] %>
+    </textarea >
+
+</div>
+<br>
+<p class='text-center p-2'>
+    <button onclick='copydata()' class='btn btn-warning'>คัดลอกตาราง</button>
+    <a onclick="history.back()" class='btn btn-secondary'>ย้อนกลับ</a>
+</p>
+<script>
+    function copydata() {
+      let textarea = document.getElementById("textareax");
+      textarea.select();
+      document.execCommand("copy");
+      alert("คัดลอกตารางไปยังคลิปบอร์ดแล้ว สามารถคลิกเมาส์ขวาแล้วเลือก 'วาง' ใน Microsoft Excel");
+    }
+</script>
+
+<%- include('layout/footer.ejs')%>

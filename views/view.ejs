@@ -1,0 +1,125 @@
+<%- include('layout/head.ejs')%>
+
+<div class='overlay' id="h_div">
+    <div class='text-center overlay' style='display:block;'>
+        <div class="container d-flex justify-content-center mt-5">
+            <div class="bg-light pt-3 rounded-3 shadow" style="height: auto; width: 700px">
+                <center><div class="loader"></div></center><br><br><br>
+                <div class="text-center pb-3">กำลังเตรียมฐานข้อมูล โปรดรอสักครู่... </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<body id='body' class="bg-dark">
+    <div class="bg-dark px-3 py-2 text-white">
+    
+        <div class="row">
+
+            <div class="col-8 text-start px-2 pt-1 m-0">
+                <div class='text-start pt-2'>
+                    <% if (data.length != 0) { %>
+                    <%= data[0].actname %> ปี พ.ศ.<%= data[0].year%> จำนวน <%= data[0].amount %> <% if (data[0].type == 'point') { %>แห่ง<% } else if (data[0].type == 'line') { %>กิโลเมตร<% } else { %>ไร่<% } %><span id="unity"></span> | <b><u><%= data[0].offname %></u></b>
+                    <% } else { %>
+                        <div class=''><i class="fa fa-exclamation-triangle" aria-hidden="true"></i><b> ไม่พบข้อมูล หรือข้อมูลนี้ถูกปรับปรุงไปแล้ว</b></div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="col-4 text-end px-2 pt-2 m-0">
+                <% if (data.length != 0) { %>
+                <a onclick="location.href='../dwl/kml/<%=data[0].publickey %>'" class='btn btn-primary px-2 py-1 my-0'>ดาวน์โหลด KML</a>
+                <% } else { %>
+                <a onclick="" class='btn btn-primary px-2 py-1 my-0 disabled'>ดาวน์โหลด KML</a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+
+<div id="map" class="" style="height:93%; width:100%"></div>
+
+</body>
+
+<script>
+    
+    var map = new L.Map('map',{zoomControl:true, maxZoom:18, minZoom:8, maxNativeZoom: 18, minNativeZoom: 8, zoomSnap: 0.5, fullscreenControl: true, fullscreenControlOptions: { position: 'topleft'}}).setView([18.81,100.79], 8.5);
+    var autolinker = new Autolinker({}); //ดึงเข้ามูลใน json มาแสดงในคำอธิบาย
+    
+    var bounds_group = new L.featureGroup([]); // group เอาไว้ใส่ชนิดข้อมูล
+    var point_gp = new L.featureGroup([]);
+    
+    map.attributionControl.setPrefix('Grossular.mapr ศูนย์ภูมิสารสนเทศเพื่อการจัดการต้นน้ำน่าน &middot Leaflet &middot OpenStreetMap');
+    
+    //สเกล
+    L.tileLayer('<% if (data.length != 0) { %>https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png<% } else { %><% } %>', {
+    }).addTo(map);
+    
+    L.control.scale().addTo(map); 
+
+    function notixxx (feature, layer) {
+                var popupContent = '' + (feature.properties['DESC_'] !== null ? autolinker.link(feature.properties['DESC_'].toLocaleString()) : '') + '';
+                layer.bindPopup(popupContent, {maxHeight: 400});
+            }
+    '<% for (var i = 0; i < data.length; i++) { %>'
+
+    map.createPane('pane<%- data[i].idkey %>');
+    map.getPane('pane<%- data[i].idkey %>').style.zIndex = 400;
+    
+    
+    var itemxxx = new L.geoJson(<%- data[i].jsondata %>, {
+    interactive: true,
+    onEachFeature: notixxx
+    
+    ,style: {
+        pane: 'pane<%- data[i].idkey %>',
+        opacity: 1,
+        color: '<%- data[i].color %>',
+        weight: 5.0,
+        fillOpacity: 0.5,
+        interactive: true,
+    }
+
+    ,pointToLayer: function (feature, latlng) {
+        var context = {
+            feature: feature,
+            variables: {}
+        };
+        return L.circleMarker(latlng, style<%- data[i].idkey %> (feature));
+    },
+
+    }).addTo(map);
+
+    function style<%- data[i].idkey %> () {
+        return {
+            radius: 3.0,
+            color: '<%- data[i].color %>',
+            weight: 2.0,
+            fill: true,
+            fillOpacity: 0.5,
+            fillColor: '<%- data[i].color %>',
+            interactive: true,
+        }
+    }
+
+    map.fitBounds(itemxxx.getBounds());
+
+    '<% } %>'
+
+</script>
+
+
+<script>
+
+
+    $(map).ready(function(){
+    $('#h_div').hide();
+    });
+
+</script>
+
+
+
+

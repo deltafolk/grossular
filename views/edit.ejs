@@ -1,0 +1,723 @@
+<%- include('layout/head.ejs')%>
+
+
+<div id="overlay" class='text-center' style='display:block;'>
+    <div class='container d-flex justify-content-center mt-5'>
+        <div class="container d-flex justify-content-center mt-5">
+            <div class="bg-light p-3 rounded-3 shadow" style="height: auto; width: 700px">
+                <center><div class="loader"></div><div id='stage' class="text-center p-3" style="font-size: 14pt">0%</div></center>
+                <div class="text-center pb-3">กำลังเตรียมฐานข้อมูล โปรดรอสักครู่... <br>ขั้นตอนนี้ขึ้นอยู่กับความเร็วของอินเทอร์เน็ต</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% for (var m = 0; m < maindb.length; m++) {%>
+
+
+    <% if (maindb[m].type != "raster") { %>
+        <script>
+            var myDiv = document.getElementById("stage");
+            myDiv.innerHTML = "ขั้นตอนที่ <%= m+1 %> จาก <%= maindb.length%>";
+        </script>
+        <script src='/jsdata/<%- (maindb[m].keyname) %>'></script>
+    <% } else { %>
+    <% } %>
+
+<% } %>
+
+<body id='body' class="bg-dark">
+    <div class="bg-dark px-3 py-2 text-white">
+    
+        <div class="row">
+
+            <div class="col-8 text-start px-2 m-0">
+                <div class='text-start pt-2'>
+                    <%= actname %> ปี พ.ศ. <%= obj_req.year %> จำนวน <%= obj_req.amount %> <span id="unity"></span> | <b><u><%= offname %></u></b>
+                    <% if (overlap_data != null) { %>
+                        <button type="button" class="btn btn-danger m-0 px-2 py-1" aria-label="Left Align" onclick="showoverlap()">รายละเอียดการทับซ้อน</button><span style="font-size:12px; color:#999999"> * กรุณาบันทึกการเปลี่ยนแปลงเพื่อตรวจสอบการทับซ้อน</span>
+                    <% } else if (overlap_data != '0') { %>
+                        <button type="button" class="btn btn-secondary m-0 px-2 py-1" aria-label="Left Align" disabled>ไม่พบการทับซ้อน</button><span style="font-size:12px; color:#999999"> * กรุณาบันทึกการเปลี่ยนแปลงเพื่อตรวจสอบการทับซ้อน</span>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="col-4 text-end px-3 pt-2 m-0">
+
+                <form onSubmit="if(!confirm('ต้องการบันทึกข้อมูลใช่หรือไม่?')){return false;};" action='/updateData' method='POST' class='p-0 m-0'>
+
+                    <input type="hidden" name='offname' value="<%= offname %>">
+                    <input type="hidden" name='actname' value="<%= actname %>">
+                    <input type="hidden" name='idkey' value="<%= idkey %>">
+                    <input type="hidden" name='type' value="<%= type %>">
+                    <textarea name="obj_req" style="display:none;" id='obj_req'><%-JSON.stringify(obj_req)%></textarea>
+                    <textarea name="jsondata" style="display:none;" id='jsondatax'></textarea>
+    
+                    <span>จำนวนที่คำนวณได้ <span id='areaCalculate'>-</span><span id="unitx"></span></span>
+                    <input type='submit' title="กรุณา 'บันทึก' การแก้ไขเมนูวาดก่อน" class='btn btn-primary px-3 py-1 my-1' value='บันทึก' id='savedata'></input>
+                    <a onclick='cancelConfirm()' class='btn btn-secondary px-3 py-1 my-1'>ยกเลิก</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<!-- ส่วนแสดงข้อมูลซ้อนทับ -->
+    <div id='overlapdata' style='display:none;' class='m-2 bg-light p-1 rounded-3 border'>
+        <table class='table table-hover'>
+            <th class='text-center'>ลำดับที่</th>
+            <th>ชื่อชั้นข้อมูลที่ทับซ้อน</th>
+            <th>รายละเอียดของชั้นข้อมูลที่ทับซ้อน</th>
+            <script>
+                const arrJSON = [];
+            </script>
+            <% if (overlap_data != null) { %>
+                <% for (var i = 0; i < overlap_data.length; i++) {%>
+                    <tr><td class='text-center'><%= i+1 %></td><td><span style="color:#a50000; font-size:18px;">&#9632;</span> <%= overlap_data[i].name %></td><td><%= overlap_data[i].desc_ %></td></tr>
+                    <script>arrJSON.push(<%- JSON.stringify(overlap_data[i].overlapJSON); %>);</script>
+                <% } %>
+            <% } %>
+        </table>
+        <script>
+            let overlapJSON = {
+                type:"",
+                features:arrJSON,
+            }
+        </script>
+        <div class='p-0 mx-4 my-0 text-dark' style='font-size:12px;'> <u>หมายเหตุ</u>* คือ ข้อมูลที่หน่วยงานเพิ่มเข้ามาในระบบ ข้อมูลอาจอยู่ในช่วงการสำรวจ เป็นข้อมูลในปีงบประมาณปัจจุบัน หรือยังดำเนินการไม่แล้วเสร็จ ซึ่งยังไม่ได้นำเข้าในฐานข้อมูลหลัก หากพบข้อมูลที่มี * กรุณาติดต่อหน่วยงานนั้นๆ โดยตรง</div>
+    </div>
+
+<!-- ส่วนแสดงแก้ไขข้อมูล -->
+    <div id='myEdit' style='display:none;' class='m-2 bg-light p-1 rounded-3 border'>
+        แก้ไขรายละเอียดข้อมูล
+    </div>
+    <% if (jsonitem == "error" && obj_req.check_xy == 1) { %>
+    <div id='checkxy_err' class='alert alert-warning text-center p-1 mb-2 mt-0 mx-2'><span class="fa fa-exclamation-circle"></span> ไม่สามารถเพิ่มหมุดพิกัดลงแผนที่ได้ ข้อมูลหมุดพิกัดที่แนบมาไม่ถูกต้อง <u><a class='link-dark' href="javascript:history.back()">คลิกเพื่อแก้ไข</a></u></div>
+    <% } %>
+    <div id="map" class=""></div>
+
+</body>
+
+<script>
+
+    var map = new L.Map('map',{zoomControl:false, maxZoom:18, minZoom:9, maxNativeZoom: 18, minNativeZoom: 9, zoomSnap: 1, fullscreenControl: true, fullscreenControlOptions: { position: 'topleft'}}).setView([<%= startup_xy%>], 12);
+    var autolinker = new Autolinker({}); //ดึงเข้ามูลใน json มาแสดงในคำอธิบาย
+
+    var bounds_group = new L.featureGroup([]); // group เอาไว้ใส่ชนิดข้อมูล
+    var point_gp = new L.featureGroup([]);
+
+    
+
+    map.attributionControl.setPrefix('Grossular ศูนย์ภูมิสารสนเทศเพื่อการจัดการต้นน้ำน่าน &middot Leaflet');
+
+    L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    }).addTo(map);
+
+    '<% if (jsonitem != "error" || jsonitem != "" ) { %>'
+
+    '<% if (obj_req.check_xy == 1 && jsonitem != "error") { %>'
+
+        '<% if (obj_req.auto_d == 1) { %>'
+
+        var tempItems = null;
+        var drawnItems = L.geoJson(<%- (jsonitem) %> , {pointToLayer: function (feature, latlng) {return L.circleMarker(latlng, tempMarker);}}).addTo(map); 
+        map.fitBounds(drawnItems.getBounds());
+        
+        '<% } else { %>'
+        var tempItems = L.geoJson(<%- (tempitem) %> , {pointToLayer: function (feature, latlng) {return L.circleMarker(latlng, tempMarker);}}).addTo(map); 
+        map.fitBounds(tempItems.getBounds());
+        tempItems.setStyle({radius: 5.0, fillColor: 'blue', fillOpacity: 0.2, weight: 3, color: 'blue'});
+        
+        var drawnItems = new L.FeatureGroup();
+
+        
+        '<% } %>'
+
+    '<% } else { %>'
+    var tempItems = null;
+    var drawnItems = new L.FeatureGroup();
+    '<% } %>'
+
+    '<% } else { %>'
+
+    var tempItems = null;
+    var drawnItems = new L.FeatureGroup();
+    '<% } %>'
+
+    //ส่วนของพื้นที่ทับซ้อน
+    var overlap_x = L.geoJson(arrJSON , {snapIgnore: true, pointToLayer: function (feature, latlng) {return L.circleMarker(latlng, tempMarker);}}).addTo(map); 
+    overlap_x.setStyle({radius: 0.0, fillColor: '#a50000', fillOpacity: 0.6, weight: 0,});
+
+    overlap_x.pm.enable({allowEditing: false, allowRemoval: false, allowRotation: false, draggable: false, allowCutting: false});
+    
+    //สเกล
+    L.control.scale().addTo(map); 
+
+    var zoomHome = L.Control.zoomHome();
+        zoomHome.addTo(map);
+
+
+    //เพิ่มไฟล์ที่แก้ไขเข้ามา ให้สีอีกรอบ
+    drawnItems.setStyle({radius: 5.0, fillColor: 'red', fillOpacity: 0.2, weight: 3, color: 'red'});
+
+
+    // ปุ่มควบคุมการวาด แยกตาม point line polygon
+    '<% if (typeinput == "polygon") {%>'
+    var drawControl = new L.Control.Draw({
+        draw: {
+        marker: false, 
+        edit: false,
+        polyline: false,
+        circle: false,
+        circlemarker: false,
+        rectangle: false,
+        polygon : {
+        shapeOptions: {
+            color: 'red',
+            opacity: 0.9,
+            weight: 3
+        }
+        }
+        },
+        edit: {
+             featureGroup: drawnItems
+            }
+        });
+    '<% } else if (typeinput == "line") { %>'
+    var drawControl = new L.Control.Draw({
+        draw: {
+        edit: false,
+        marker: false, 
+        polygon: false,
+        circle: false,
+        circlemarker: false,
+        rectangle: false,   
+        polyline : {
+        shapeOptions: {
+            color: 'red',
+            opacity: 0.8,
+            weight: 4
+        }
+        }
+        },
+        edit: {
+             featureGroup: drawnItems
+            }
+        });
+    '<% } else { %>'  
+    var drawControl = new L.Control.Draw({
+        draw: {
+        edit: false,
+        polyline: false, 
+        polygon: false,
+        circle: false,
+        circlemarker: false,
+        rectangle: false,   
+        marker: {
+        icon: new L.Icon({
+            shadowUrl: null,
+            iconAnchor: new L.Point(12, 12),
+            iconSize: new L.Point(15, 15),
+            iconUrl: '../images/point_edit.svg'
+
+            })
+        }
+        },
+        edit: {
+             featureGroup: drawnItems
+            }
+        });
+    '<% } %>'  
+
+    map.addControl(drawControl);
+
+        //temp marker
+    var tempMarker= L.Icon.extend({
+        shadowUrl: null,
+        iconAnchor: new L.Point(12, 12),
+        iconSize: new L.Point(18, 18),
+    });
+
+        //config ของ editor
+    map.on('draw:created', function(event){
+
+        document.getElementById("savedata").disabled = false;
+
+        var layer = event.layer;
+        feature = layer.feature = layer.feature || {};
+        feature.type = feature.type || "Feature";
+
+        var props = feature.properties = feature.properties || {};
+
+        drawnItems.addLayer(layer);
+            
+        });
+
+    //enable save btn after save edit
+    map.on('draw:edited', function (e) {
+        var layers = e.layers;
+        //console.log("save edit");
+        document.getElementById("savedata").disabled = false;
+        layers.eachLayer(function (layer) {
+        });
+    });
+
+    //enable save btn after save delete
+    map.on('draw:deleted', function (e) {
+        var layers = e.layers;
+        //console.log("save deleted");
+        document.getElementById("savedata").disabled = false;
+        layers.eachLayer(function (layer) {
+        });
+    });
+
+       
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //diable save btn after click edit
+    L.EditToolbar.include({
+    getActions: function (handler) {
+        //console.log('draw start');
+        document.getElementById("savedata").disabled = true;
+    var actions = [
+      {
+        title: L.drawLocal.edit.toolbar.actions.save.title,
+        text: L.drawLocal.edit.toolbar.actions.save.text,
+        callback: this._save,
+        context: this
+      },
+      {
+        title: L.drawLocal.edit.toolbar.actions.cancel.title,
+        text: L.drawLocal.edit.toolbar.actions.cancel.text,
+        callback: this._cancel,  
+        context: this
+      }
+    ];
+
+    if (handler.removeAllLayers) {
+      actions.push({
+        title: L.drawLocal.edit.toolbar.actions.clearAll.title,
+        text: L.drawLocal.edit.toolbar.actions.clearAll.text,
+        callback: this._clearAllLayers,
+        context: this
+      });
+    }
+
+    return actions;
+    },
+
+
+    _cancel: function() {
+        this.disable();
+        this._map.fire('draw:editcancel');
+    }  
+    });
+
+    //enable save btn after cancle edit
+    function processCancel(e) {
+        //console.log('draw canceled');
+        document.getElementById("savedata").disabled = false;
+    }
+    map.on('draw:editcancel', processCancel);
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //diable save btn after click create////////////////////////////////
+    L.DrawToolbar.include({
+        getActions: function (handler) {
+        document.getElementById("savedata").disabled = true;    
+        return [
+                {
+                    enabled: handler.completeShape,
+                    title: L.drawLocal.draw.toolbar.finish.title,
+                    text: L.drawLocal.draw.toolbar.finish.text,
+                    callback: handler.completeShape,
+                    context: handler
+                },
+                {
+                    enabled: handler.deleteLastVertex,
+                    title: L.drawLocal.draw.toolbar.undo.title,
+                    text: L.drawLocal.draw.toolbar.undo.text,
+                    callback: handler.deleteLastVertex,
+                    context: handler
+                },
+                {
+                    title: L.drawLocal.draw.toolbar.actions.title,
+                    text: L.drawLocal.draw.toolbar.actions.text,
+                    callback: this._cancel,
+                    context: this
+                }
+        ];
+    },
+
+    _cancel: function() {
+        this.disable();
+        this._map.fire('draw:editcancel');
+        document.getElementById("savedata").disabled = false;
+    }  
+    
+    });
+
+
+    //tooltip ของ area calculate
+    map.on(L.Draw.Event.CREATED, function(event) {
+        var layer = event.layer;
+
+        if(layer instanceof L.Polygon) {
+            createAreaTooltip(layer);
+        }
+
+        drawnItems.addLayer(layer);
+    });
+
+    //tooltip ของ area calculate
+    map.on(L.Draw.Event.EDITED, function(event) {
+        event.layers.getLayers().forEach(function(layer) {
+            if(layer instanceof L.Polygon) {
+                updateAreaTooltip(layer);
+            }
+        })
+    });
+
+    map.doubleClickZoom.disable();
+
+    // function หา nativezoom 
+    function nativemax(input){
+        if (input == 'L7018000'){
+            return 15;
+        }
+        else if (input == 'cDAbad5A'){
+            return 17;
+        }
+        else if (input == 'LDD45000'){
+            return 16;
+        }
+        else if (input == 'XzAYKGsT'){
+            return 17;
+        }
+        else {
+            return 18;
+        }
+    }
+
+    function nativemin(input){
+        if (input == 'L7018000'){
+            return 9;
+        }
+        else if (input == 'cDAbad5A'){
+            return 9;
+        }
+        else if (input == 'LDD45000'){
+            return 12;
+        }
+        else if (input == 'XzAYKGsT'){
+            return 9;
+        }
+        else {
+            return 9;
+        }
+    }
+
+    //////////////////////////////ส่วนของข้อมูล raster///////////////////////////////////////
+    '<% Object.values(maindb).forEach(function(item) {%>'
+        '<% if (item.type == "raster") { %>'
+            var <%- (item.keyname) %> = L.tileLayer('<%- (item.url_xyz) %>', {zoomControl:true, maxZoom:18, minZoom:9, maxNativeZoom: nativemax('<%- (item.keyname) %>'), minNativeZoom: nativemin('<%- (item.keyname) %>')});
+            var gr<%- (item.keyname) %> = L.layerGroup([<%- (item.keyname) %>,]);
+        '<% } else { %>'
+        '<% } %>'
+    '<% }) %>'
+
+    var baseMaps = {
+        
+    <% Object.values(maindb).forEach(function(item) {%> 
+        <% if (item.type == "raster") { %>  
+            <%- "'" + (item.name) + "' :" + "gr" + (item.keyname) + "," %>
+        <% } else { %>
+        <% } %>    
+    <% }) %>
+
+    };
+
+
+    //////////////////////ส่วนของ point///////////////////////////////////////////////////
+    '<% Object.values(maindb).forEach(function(item) {%>'
+        '<% if (item.type == "point") { %>'
+
+        function noti_point (feature, layer) {
+                var popupContent = '' + (feature.properties['DESC_'] !== null ? autolinker.link(feature.properties['DESC_'].toLocaleString()) : '') + '';
+                layer.bindPopup(popupContent, {maxHeight: 400});
+            }
+        map.createPane('pane<%- (item.keyname) %>');
+        map.getPane('pane<%- (item.keyname) %>').style.zIndex = 500 + <%- (item.orderx) %>;
+
+            var <%- (item.keyname) %> = new L.geoJson(<%- (item.keyname) %>, {
+                    interactive: true,
+                    onEachFeature: noti_point
+
+                    ,pointToLayer: function (feature, latlng) {
+                        var context = {
+                            feature: feature,
+                            variables: {}
+                        };
+                        return L.circleMarker(latlng, style<%- (item.keyname) %> (feature));
+                    },
+                });
+
+            var gr<%- (item.keyname) %> = L.layerGroup([<%- (item.keyname) %>,]);
+
+            function style<%- (item.keyname) %>() {
+                return {
+                    radius: 5.0,
+                    color: '<%- (item.color) %>',
+                    weight: 2.0,
+                    fill: true,
+                    fillOpacity: 0.5,
+                    fillColor: '<%- (item.color) %>',
+                    interactive: true,
+                }
+            }
+
+            //<%- (item.keyname) %>.pm.enable({allowEditing: false, allowRemoval: false, allowRotation: false, draggable: false, allowCutting: false});
+
+
+        '<% } else { %>'
+        '<% } %>'
+    '<% }) %>'
+
+
+    //////////////////////ส่วนของ line///////////////////////////////////////////////////
+    '<% Object.values(maindb).forEach(function(item) {%>'
+        '<% if (item.type == "line") { %>'
+
+        function noti_line (feature, layer) {
+                var popupContent = '' + (feature.properties['DESC_'] !== null ? autolinker.link(feature.properties['DESC_'].toLocaleString()) : '') + '';
+                layer.bindPopup(popupContent, {maxHeight: 400});
+            }
+        map.createPane('pane<%- (item.keyname) %>');
+        map.getPane('pane<%- (item.keyname) %>').style.zIndex = 500 + <%- (item.orderx) %>;
+
+            var <%- (item.keyname) %> = new L.geoJson(<%- (item.keyname) %>, {
+                        interactive: true,
+                        onEachFeature: noti_line
+            
+                        ,style: {
+                            pane: 'pane<%- (item.keyname) %>',
+                            opacity: 1,
+                            color: '<%- (item.color) %>',
+                            weight: 3.0,
+                            fillOpacity: 0.2,
+                            interactive: true,
+                        },
+                    });
+
+            var gr<%- (item.keyname) %> = L.layerGroup([<%- (item.keyname) %>,]);
+
+            <%- (item.keyname) %>.pm.enable({allowEditing: false, allowRemoval: false, allowRotation: false, draggable: false, allowCutting: false});
+
+        '<% } else { %>'
+        '<% } %>'
+    '<% }) %>'
+
+
+    //////////////////////ส่วนของ polygon///////////////////////////////////////////////////
+    '<% Object.values(maindb).forEach(function(item) {%>'
+        '<% if (item.type == "polygon") { %>'
+
+        function noti_polygon (feature, layer) {
+                var popupContent = '' + (feature.properties['DESC_'] !== null ? autolinker.link(feature.properties['DESC_'].toLocaleString()) : '') + '';
+                layer.bindPopup(popupContent, {maxHeight: 400});
+            }
+        map.createPane('pane<%- (item.keyname) %>');
+        map.getPane('pane<%- (item.keyname) %>').style.zIndex = 500 + <%- (item.orderx) %>;
+
+            var <%- (item.keyname) %> = new L.geoJson(<%- (item.keyname) %>, {
+                    interactive: true,
+                    onEachFeature: noti_polygon
+
+                    ,style: {
+                        pane: 'pane<%- (item.keyname) %>',
+                        opacity: 1,
+                        color: '<%- (item.color) %>',
+                        weight: 2.0,
+                        fillOpacity: 0.1,
+                        interactive: true,
+                    },
+                })
+                
+                // add ฐานข้อมูล to map ตามพื้นที่ที่ทับซ้อน 
+
+                <% if (overlap_data != null) { %>
+                    <% for (var i = 0; i < overlap_data.length; i++) {%>
+                        <% if (overlap_data[i].dbkeyname == item.keyname) { %>
+                            .addTo(map)
+                        <% } %>
+                    <% } %>
+                <% } %>
+                
+                ;
+
+            var gr<%- (item.keyname) %> = L.layerGroup([<%- (item.keyname) %>,]);
+
+            <%- (item.keyname) %>.pm.enable({allowEditing: false, allowRemoval: false, allowRotation: false, draggable: false, allowCutting: false});
+
+        '<% } else { %>'
+        '<% } %>'
+    '<% }) %>'
+
+
+    ////////////////////////////////ส่วนของ point line polygon/////////////////////////////////
+
+    var baseVector = {
+        
+        <% Object.values(maindb).forEach(function(item) {%> 
+            <% if (item.type == "point") { %>  
+                <%- "'&nbsp;&#9679 " + (item.name) + "' :" + "gr" + (item.keyname) + "," %>
+            <% } else if (item.type == "line"){ %>
+                <%- "'&#x29DF " + (item.name) + "' :" + "gr" + (item.keyname) + "," %>  
+            <% } else if (item.type == "polygon"){ %>
+                <%- "'&#11040 " + (item.name) + "' :" + "gr" + (item.keyname) + "," %>
+            <% } else { %>
+            <% } %>
+        <% }) %>
+    
+        };
+
+
+
+
+    /////////////////////////////////ส่วนของ user data////////////////////////////////////
+    function noti_userdata (feature, layer) {
+                var popupContent = '' + (feature.properties['DESC_'] !== null ? autolinker.link(feature.properties['DESC_'].toLocaleString()) : '') + '';
+                layer.bindPopup(popupContent, {maxHeight: 800});
+    }
+
+    var json_userdata = <%- JSON.stringify(obj_userdata) %>;
+    var userdatax = L.geoJson(json_userdata, {interactive: true, onEachFeature: noti_userdata,  pointToLayer: function (feature, latlng) {return L.circleMarker(latlng, tempMarker);}}).addTo(map); 
+    userdatax.setStyle({radius: 0.0, fillColor: '#000000', fillOpacity: 0.8, weight: 0,});
+
+    userdatax.pm.enable({allowEditing: false, allowRemoval: false, allowRotation: false, draggable: false, allowCutting: false});
+
+    ////////////////////////////////////////////////////////////////////////////////////
+
+
+    L.control.layers(baseMaps,baseVector, {collapsed:true}).addTo(map);
+
+    L.latlngGraticule({
+            showLabel: true,
+            color: 'white',
+            zoomInterval: [
+                {start: 9, end: 9, interval: 1},
+                {start: 10, end: 10, interval: 0.5},
+                {start: 11, end: 11, interval: 0.3},	
+                {start: 12, end: 12, interval: 0.1},	
+                {start: 13, end: 13, interval: 0.07},	
+                {start: 14, end: 14, interval: 0.05},	
+                {start: 15, end: 15, interval: 0.02},	
+                {start: 16, end: 16, interval: 0.008},	
+                {start: 17, end: 17, interval: 0.005},	
+                {start: 18, end: 18, interval: 0.002},
+            ]
+    }).addTo(map);
+
+    //เพิ่มข้อมูลไปยัง textbox เมื่อเพิ่มข้อมูลใน map
+    document.getElementById("body").addEventListener("mouseover", function(){
+        var json_data = $('#jsondatax').val(JSON.stringify(drawnItems.toGeoJSON())); //jquery เพิ่มข้อมูลลงใน form
+        var json_input = drawnItems.toGeoJSON();
+
+        if (json_input.features.length == 0){document.getElementById("savedata").disabled = true;
+            
+        }
+        else {}
+        ;
+
+        //console.log(json_input);
+
+        var amnt = amountCalculate(json_input);
+        document.getElementById("areaCalculate").innerHTML = amnt.toFixed(2);
+
+            
+    });
+
+        //บนมือถือ
+    document.getElementById("body").addEventListener("touchstart", function(){
+        var json_data = $('#jsondatax').val(JSON.stringify(drawnItems.toGeoJSON())); //jquery เพิ่มข้อมูลลงใน form
+        var json_input = drawnItems.toGeoJSON();
+
+        if (json_input.features.length == 0){document.getElementById("savedata").disabled = true;}
+        else {}
+        ;
+            
+        var amnt = amountCalculate(json_input);
+        document.getElementById("areaCalculate").innerHTML = amnt.toFixed(2);
+    });
+
+    //ส่วนข้อง snapping
+    map.pm.addControls({  
+    position: 'topleft',  
+    drawCircle: false,
+    drawMarker: false,
+    drawCircleMarker: false,
+    drawPolyline: false,
+    drawRectangle: false,
+    drawPolygon: false,
+    drawText: false,
+    cutPolygon: false,
+    removalMode: false,
+    rotateMode: false,
+    dragMode: false
+    });  
+
+    //ย้าย drawnitem มาไว้ด้านบนสุด
+    map.addLayer(drawnItems);
+
+
+</script>
+
+<script>
+    let typeobj = '<%= typeinput%>';
+    if (typeobj == 'point'){
+        document.getElementById("unity").innerHTML = ' แห่ง ';
+        document.getElementById("unitx").innerHTML = ' แห่ง ';
+    }
+    else if (typeobj == 'line'){
+        document.getElementById("unity").innerHTML = ' กิโลเมตร ';
+        document.getElementById("unitx").innerHTML = ' กิโลเมตร ';
+    }
+    else {
+        document.getElementById("unity").innerHTML = ' ไร่ ';
+        document.getElementById("unitx").innerHTML = ' ไร่ ';
+    }
+</script>
+
+<script>
+
+
+    function cancelConfirm() {
+    if (confirm('ข้อมูลจะไม่ถูกบันทึก ดำเนินการต่อหรือไม่?') == true) {
+        window.location.href = '/home';
+    } 
+    else {
+    }
+}
+    function showoverlap(){
+
+        let show_btn = document.getElementById("overlapdata");
+
+        if (show_btn.style.display == "none") {
+            show_btn.style.display = "block";
+        }
+        else {
+            show_btn.style.display = "none";
+        }
+    }
+
+    $(map).ready(function(){
+    $('#h_div').hide();
+    });
+
+    var overlay_loading = document.getElementById("overlay")
+    overlay_loading.style.display = "none"
+
+</script>
+
+
+
+

@@ -1,0 +1,598 @@
+<%- include('layout/head.ejs')%>
+<%- include('layout/navbar.ejs')%>
+
+<!-- <%- title %><br>
+
+<%= legend %><br>
+<%= check_legend %><br>
+<%= qrcode %><br>
+<%= JSON.stringify(xytopo) %><br>
+<%= JSON.stringify(xyortho) %><br>
+<%= mapsheet %><br>
+<%= mapcenter %><br><br>
+<%= JSON.stringify(jsondata[6]) %><br><br>
+<%= raw_jsondata %><br> -->
+
+<div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow border" style="height: auto; width: 100%">
+        <div class="text-end p-2">
+    </div>
+    <div class="alart alert-dark m-2 p-2 rounded-3 text-center"><i class="fa fa-info-circle" aria-hidden="true"></i> แผนที่ภูมิประเทศ และแผนที่ภาพถ่ายทางอากาศ ตั้งค่ามาตราส่วนแผนที่โดย<i>อัตโนมัติ</i> <u>กรุณาอย่าปรับลด หรือขยายขนาดของแผนที่</u></div>
+
+    <div class='text-center mb-3'><button id='dwl' class='btn btn-primary m-2' onclick='dwltopo()'>ดาวน์โหลดแผนที่ภูมิประเทศ</button><button id='dwlortho' class='btn btn-primary m-2' onclick='dwlortho()'>ดาวน์โหลดแผนที่ภาพถ่ายทางอากาศ</button><a class="btn btn-secondary" onclick="history.back()">ย้อนกลับ</a></div>
+
+    <div class="overflow_ px-4 pb-4">
+        <div id='topographicmap' style="width: 31.5cm; height: 44.55cm; background-color: #FFFFFF" class='shadow'>
+        
+        
+        <table class=''>
+        <tr class='' colspan='5' style='height: 4.5cm'>
+        
+        <td style='width: 31.35cm'><div class='mt-5 mb-1 mx-5 text-center title' style='font-size: 20px; line-height: 150%;'><%- title %></div></td>
+        </tr>
+        <table>
+        <tr class='text-center' style='height: 1.05cm'>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.5cm'></td>
+        <td style='width: 6cm'><small><%= xytopo.coorX[0]%></small></td>
+        <td style='width: 6cm'><small><%= xytopo.coorX[1]%></small></td>
+        <td style='width: 6cm'><small><%= xytopo.coorX[2]%></small></td>
+        <td style='width: 6cm'><small><%= xytopo.coorX[3]%></small></td>
+        <td style='width: 1.5cm'></td>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm'></td>
+        </tr>
+        
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm' class='centercenter'>
+            <div class="text_r px-3" style='height:6cm'><small><%= xytopo.coorY[0]%></small></div>
+            <div class="text_r px-3" style='height:6cm'><small><%= xytopo.coorY[1]%></small></div>
+            <div class="text_r px-3" style='height:6cm'><small><%= xytopo.coorY[2]%></small></div>
+            <div class="text_r px-3" style='height:6cm'><small><%= xytopo.coorY[3]%></small></div>
+            <div class="text_r px-3" style='height:6cm'><small><%= xytopo.coorY[4]%></small></div>
+        </td>
+        <td colspan='6' style='width: 30cm; height: 30cm; background-color: white'><div id="maptopo" class="mapprint" style='border-style: solid; border-width: thin;'></div></td>
+        <td style='width: 1.05cm' class='centercenter'>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xytopo.coorY[0]%></small></div>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xytopo.coorY[1]%></small></div>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xytopo.coorY[2]%></small></div>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xytopo.coorY[3]%></small></div>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xytopo.coorY[4]%></small></div>
+        </td>
+        <td style='width: 1.05cm'>
+        </td>
+        
+        
+        
+        <tr class='text-center' style='height: 1.05cm'>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.5cm'></td>
+        <td style='width: 6cm'><small><%= xytopo.coorX[0]%></small></td>
+        <td style='width: 6cm'><small><%= xytopo.coorX[1]%></small></td>
+        <td style='width: 6cm'><small><%= xytopo.coorX[2]%></small></td>
+        <td style='width: 6cm'><small><%= xytopo.coorX[3]%></small></td>
+        <td style='width: 1.5cm'></td>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm'></td>
+        </tr>
+        </table>
+        
+        
+        <% if (maptype == '01') { %>
+        <table class='' style="">
+            <tr class='' style='height: 6.75cm'>
+                <td style='width: 1cm'></td>
+                <td style='width: 0.9cm'></td>
+                <td style='width: 5.1cm; background-color: white'><div id="mapindex" class="mapindex ms-2 leaflet-container" style='border-style: solid; border-width: thin;'></div></td>
+                <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                    <div class='ms-5 my-2 h6'><b style='font-size:17px'>คำอธิบายสัญลักษณ์</b><br>
+                    <% if (check_legend == '1') { %>
+                        <% for (var i = 1; i < legend.length && i < 6; i++) { %>
+                        <div class='row mx-0 mb-2 mt-3'><span class=""><img src="images/legend/<%= typeinput%><%= i %>.svg"> <%= legend[i]%></span></div>
+                        <% } %>
+                    <% } else { %>
+                        <div class='row mx-0 mb-2 mt-3'><span class=""><img src="images/legend/<%= typeinput%>1.svg"> <%= legend[0] %></span></div>
+                    <% } %>
+                    <div class='row mx-0 mb-2 mt-3'><span class=""><img src="images/legend/forest.svg"> แนวเขตพื้นที่ป่าอนุรักษ์</span></div>
+                    </div>
+                </td>
+                <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                    <div class='ms-5 my-2 h6'><b style='font-size:17px'>&nbsp;</b><br>
+                    <% if (check_legend === '1') { %>
+                        <% for (var j = 6; j < legend.length && i < 11; j++) { %>
+                        <div class='row mx-0 mb-2 mt-3'><span class=""><img src="images/legend/<%= typeinput%><%= j %>.svg"> <%= legend[j]%></span></div>
+                        <% } %>
+                    <% } else { %>
+                    <% } %>
+                    </div>
+                </td>
+                <td style='width: 6cm; background-color: white' class='centertop mt-5 pt-2'>
+                    <div class='my-3 h6'><b><div class='m-0'>มาตราส่วน <%= xytopo.scale%></div></b><br>
+                    <div style=''>
+                    <% if (qrcode == '1') { %>
+                        <img src='https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=http://gisnan.ddnsthailand.com:8080/view/<%= publickey%>'><br><div class='m-2'><small>ดูรายละเอียด (kml)</small></div></dvi>
+                    <% } %>    
+                    </div>
+                    <div class='py-2'><small>แผนที่ภูมิประเทศ ลำดับชุด L7018<br>เลขระวาง <% for (var k = 0; k < mapsheet.length; k++) { %><%= mapsheet[k] %> <% } %><small></div>
+                </td>
+                <td style='width: 0.9cm'></td>
+                <td style='width: 1cm'></td>
+            </tr>
+        </table>
+
+        <% } else if (maptype == '02') { %>
+
+        <table class=''>
+            <tr class='' style='height: 6.75cm'>
+                <td style='width: 0.6cm'></td>
+                <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                    <div class='ms-5 my-0 h6'><b style='font-size:17px'> &nbsp คำอธิบายสัญลักษณ์</b><br>
+                    <div class='row mx-0 mb-2 mt-2'><span class="" style="font-size:12px"><img src="images/legend/forest.svg"> แนวเขตพื้นที่ป่าอนุรักษ์</span></div>
+                    <% if (check_legend == '1') { %>
+                        <% for (var i = 1; i < legend.length && i < 3; i++) { %>
+                        <div class='row mx-0 mb-2 mt-2'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%><%= i %>.svg"> <%= legend[i]%></span></div>
+                        <% } %>
+                    <% } else { %>
+                        <div class='row mx-0 mb-2 mt-2'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%>1.svg"> <%= legend[0] %></span></div>
+                    <% } %>
+                    </div>
+                </td>
+                <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                    <div class='ms-5 my-2 h6'><b style='font-size:17px'>&nbsp;</b><br>
+                    <% if (check_legend === '1') { %>
+                        <% for (var j = 3; j < legend.length && j < 6; j++) { %>
+                        <div class='row mx-0 mb-2 mt-0'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%><%= j %>.svg"> <%= legend[j]%></span></div>
+                        <% } %>
+                    <% } else { %>
+                    <% } %>
+                    </div>
+                </td>
+                <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                    <div class='ms-5 my-2 h6'><b style='font-size:17px'>&nbsp;</b><br>
+                    <% if (check_legend === '1') { %>
+                        <% for (var j = 6; j < legend.length && j < 9; j++) { %>
+                        <div class='row mx-0 mb-2 mt-0'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%><%= j %>.svg"> <%= legend[j]%></span></div>
+                        <% } %>
+                    <% } else { %>
+                    <% } %>
+                    </div>
+                </td>
+                <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                    <div class='ms-5 my-2 h6'><b style='font-size:17px'>&nbsp;</b><br>
+                    <% if (check_legend === '1') { %>
+                        <% for (var j = 9; j < legend.length && j < 12; j++) { %>
+                        <div class='row mx-0 mb-2 mt-0'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%><%= j %>.svg"> <%= legend[j]%></span></div>
+                        <% } %>
+                    <% } else { %>
+                    <% } %>
+                    </div>
+                </td>
+                <td style='width: 6cm; background-color: white' class='centertop mt-5 pt-2'>
+                    <div class='my-1 h6'><b><div class='m-0'>มาตราส่วน <%= xytopo.scale%></div></b><br>
+                    <div style=''>
+  
+                    </div>
+                    <div class='py-2'><small>แผนที่ภูมิประเทศ ลำดับชุด L7018<br>เลขระวาง <% for (var k = 0; k < mapsheet.length; k++) { %><%= mapsheet[k] %> <% } %><small></div>
+                </td>
+                <td style='width: 0.9cm'></td>
+                <td style='width: 1cm'></td>
+            </tr>
+        </table>
+
+        <% } %>
+
+
+
+    </div>
+    </div>
+    </div>
+</div>
+
+
+
+<!-- ส่วนของ ortho -->
+
+
+<div class='container d-flex justify-content-center mt-4'>
+    <div class="bg-light p-2 rounded-3 shadow" style="height: auto; width: 100%">
+        <div class="text-end p-2">
+    </div>
+    <div class="overflow_ px-4 pb-4">
+        <div id='orthomap' style="width: 31.5cm; height: 44.55cm; background-color: #FFFFFF" class='shadow'>
+
+
+        <table class=''>
+            <tr class='' colspan='5' style='height: 4.5cm'>
+
+                <td style='width: 31.35cm'><div class='mt-5 mb-1 mx-5 text-center title' style='font-size: 20px; line-height: 150%;'><%- title %></div></td>
+        </tr>
+        <table>
+        <tr class='text-center' style='height: 1.05cm'>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.5cm'></td>
+        <td style='width: 6cm'><small><%= xyortho.coorX[0]%></small></td>
+        <td style='width: 6cm'><small><%= xyortho.coorX[1]%></small></td>
+        <td style='width: 6cm'><small><%= xyortho.coorX[2]%></small></td>
+        <td style='width: 6cm'><small><%= xyortho.coorX[3]%></small></td>
+        <td style='width: 1.5cm'></td>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm'></td>
+        </tr>
+
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm' class='centercenter'>
+            <div class="text_r px-3" style='height:6cm'><small><%= xyortho.coorY[0]%></small></div>
+            <div class="text_r px-3" style='height:6cm'><small><%= xyortho.coorY[1]%></small></div>
+            <div class="text_r px-3" style='height:6cm'><small><%= xyortho.coorY[2]%></small></div>
+            <div class="text_r px-3" style='height:6cm'><small><%= xyortho.coorY[3]%></small></div>
+            <div class="text_r px-3" style='height:6cm'><small><%= xyortho.coorY[4]%></small></div>
+        </td>
+        <td colspan='6' style='width: 30cm; height: 30cm; background-color: white'><div id="maportho" class="mapprint" style='border-style: solid; border-width: thin;'></div></td>
+        <td style='width: 1.05cm' class='centercenter'>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xyortho.coorY[0]%></small></div>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xyortho.coorY[1]%></small></div>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xyortho.coorY[2]%></small></div>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xyortho.coorY[3]%></small></div>
+            <div class="text_l text-center px-2" style='height:6cm'><small><%= xyortho.coorY[4]%></small></div>
+        </td>
+        <td style='width: 1.05cm'>
+        </td>
+
+
+
+        <tr class='text-center' style='height: 1.05cm'>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.5cm'></td>
+        <td style='width: 6cm'><small><%= xyortho.coorX[0]%></small></td>
+        <td style='width: 6cm'><small><%= xyortho.coorX[1]%></small></td>
+        <td style='width: 6cm'><small><%= xyortho.coorX[2]%></small></td>
+        <td style='width: 6cm'><small><%= xyortho.coorX[3]%></small></td>
+        <td style='width: 1.5cm'></td>
+        <td style='width: 1.05cm'></td>
+        <td style='width: 1.05cm'></td>
+        </tr>
+        </table>
+
+
+
+        <% if (maptype == '01') { %>
+            <table class='' style="">
+                <tr class='' style='height: 6.75cm'>
+                    <td style='width: 1cm'></td>
+                    <td style='width: 0.9cm'></td>
+                    <td style='width: 5.1cm; background-color: white'><div id="mapindex2" class="mapindex ms-2 leaflet-container" style='border-style: solid; border-width: thin;'></div></td>
+                    <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                        <div class='ms-5 my-2 h6'><b style='font-size:17px'>คำอธิบายสัญลักษณ์</b><br>
+                        <% if (check_legend == '1') { %>
+                            <% for (var i = 1; i < legend.length && i < 6; i++) { %>
+                            <div class='row mx-0 mb-2 mt-3'><span class=""><img src="images/legend/<%= typeinput%><%= i %>.svg"> <%= legend[i]%></span></div>
+                            <% } %>
+                        <% } else { %>
+                            <div class='row mx-0 mb-2 mt-3'><span class=""><img src="images/legend/<%= typeinput%>1.svg"> <%= legend[0] %></span></div>
+                        <% } %>
+                        <div class='row mx-0 mb-2 mt-3'><span class=""><img src="images/legend/forest.svg"> แนวเขตพื้นที่ป่าอนุรักษ์</span></div>
+                        </div>
+                    </td>
+                    <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                        <div class='ms-5 my-2 h6'><b style='font-size:17px'>&nbsp;</b><br>
+                        <% if (check_legend === '1') { %>
+                            <% for (var j = 6; j < legend.length && i < 11; j++) { %>
+                            <div class='row mx-0 mb-2 mt-3'><span class=""><img src="images/legend/<%= typeinput%><%= j %>.svg"> <%= legend[j]%></span></div>
+                            <% } %>
+                        <% } else { %>
+                        <% } %>
+                        </div>
+                    </td>
+                    <td style='width: 6cm; background-color: white' class='centertop mt-5 pt-2'>
+                        <div class='my-2 h6'><b><div class='m-0'>มาตราส่วน <%= xyortho.scale%></div></b><br>
+                        <div style=''>
+                        <% if (qrcode == '1') { %>
+                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=http://gisnan.ddnsthailand.com:8080/view/<%= publickey%>'><br><div class='m-2'><small>ดูรายละเอียด (kml)</small></div></dvi>
+                        <% } %>   
+                        </div>
+                        <div class='py-2'><small><%- orthoname %><small></div>
+                            
+                    </td>
+
+                    <td style='width: 0.9cm'></td>
+                    <td style='width: 1cm'></td>
+                </tr>
+            </table>
+    
+            <% } else if (maptype == '02') { %>
+    
+            <table class=''>
+                <tr class='' style='height: 6.75cm'>
+                    <td style='width: 0.6cm'></td>
+                    <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                        <div class='ms-5 my-0 h6'><b style='font-size:17px'> &nbsp คำอธิบายสัญลักษณ์</b><br>
+                        <div class='row mx-0 mb-2 mt-2'><span class="" style="font-size:12px"><img src="images/legend/forest.svg"> แนวเขตพื้นที่ป่าอนุรักษ์</span></div>
+                        <% if (check_legend == '1') { %>
+                            <% for (var i = 1; i < legend.length && i < 3; i++) { %>
+                            <div class='row mx-0 mb-2 mt-2'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%><%= i %>.svg"> <%= legend[i]%></span></div>
+                            <% } %>
+                        <% } else { %>
+                            <div class='row mx-0 mb-2 mt-2'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%>1.svg"> <%= legend[0] %></span></div>
+                        <% } %>
+                        </div>
+                    </td>
+                    <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                        <div class='ms-5 my-2 h6'><b style='font-size:17px'>&nbsp;</b><br>
+                        <% if (check_legend === '1') { %>
+                            <% for (var j = 3; j < legend.length && j < 6; j++) { %>
+                            <div class='row mx-0 mb-2 mt-0'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%><%= j %>.svg"> <%= legend[j]%></span></div>
+                            <% } %>
+                        <% } else { %>
+                        <% } %>
+                        </div>
+                    </td>
+                    <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                        <div class='ms-5 my-2 h6'><b style='font-size:17px'>&nbsp;</b><br>
+                        <% if (check_legend === '1') { %>
+                            <% for (var j = 6; j < legend.length && j < 9; j++) { %>
+                            <div class='row mx-0 mb-2 mt-0'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%><%= j %>.svg"> <%= legend[j]%></span></div>
+                            <% } %>
+                        <% } else { %>
+                        <% } %>
+                        </div>
+                    </td>
+                    <td style='width: 8.1cm; background-color: white' class='lefttop'>
+                        <div class='ms-5 my-2 h6'><b style='font-size:17px'>&nbsp;</b><br>
+                        <% if (check_legend === '1') { %>
+                            <% for (var j = 9; j < legend.length && j < 12; j++) { %>
+                            <div class='row mx-0 mb-2 mt-0'><span class="" style="font-size:12px"><img src="images/legend/<%= typeinput%><%= j %>.svg"> <%= legend[j]%></span></div>
+                            <% } %>
+                        <% } else { %>
+                        <% } %>
+                        </div>
+                    </td>
+                    <td style='width: 6cm; background-color: white' class='centertop mt-5 pt-2'>
+                        <div class='my-2 h6'><b><div class='m-0'>มาตราส่วน <%= xyortho.scale%></div></b><br>
+                        <div style=''>
+
+                        </div>
+                        <div class='py-2'><small><%- orthoname %><small></div>
+                    </td>
+                    <td style='width: 0.9cm'></td>
+                    <td style='width: 1cm'></td>
+                </tr>
+            </table>
+    
+            <% } %>
+
+
+    </div>
+    </div>
+    </div>
+
+</div>
+
+<script src='/jsdata/nan00000'></script>
+<script src='/jsdata/FOREST01'></script>
+
+<script>
+    var maptopo = new L.Map('maptopo',{zoomControl:false, maxZoom:15, zoomSnap: 0.05, minZoom:10, touchZoom:!L.Browser.mobile}).setView([<%= xytopo.newcenter %>], <%= xytopo.zoom%>),
+
+        stamenTerrain = L.tileLayer('tile_service/l7018_tile/{z}/{x}/{y}.png').addTo(maptopo);
+        maptopo.attributionControl.setPrefix('');
+
+    '<% if (check_legend == "1") { %>'
+    '<% for (var i = 0; i < jsondata.length; i++) { %>'
+    '<% if (jsondata[i].features[1] != null) { %>'
+    '<% jsondata[i].features.pop() } %>'
+
+        var data_item_<%= i %> = L.geoJson(<%- JSON.stringify((jsondata)[i]) %>,
+            { pointToLayer: function (feature, latlng) 
+                {return L.circleMarker(latlng, tempMarker);}
+            }).addTo(maptopo); 
+        data_item_<%= i %>.setStyle({radius: 6.0, fillColor: '<%= colorArr[i] %>', fillOpacity: 0.2, weight: 4, color: '<%= colorArr[i] %>'});
+
+    '<% } %>'
+    '<% } else { %>'
+    var data_item = L.geoJson(<%- (raw_jsondata) %>,
+        { pointToLayer: function (feature, latlng) 
+            {return L.circleMarker(latlng, tempMarker);}
+        }).addTo(maptopo); 
+    data_item.setStyle({radius: 6.0, fillColor: 'red', fillOpacity: 0.2, weight: 4, color: 'red'});
+    '<% } %>'
+
+    var forerest01 = L.geoJson(FOREST01,
+        { pointToLayer: function (feature, latlng) 
+            {return L.circleMarker(latlng, tempMarker);}
+        }).addTo(maptopo);
+    forerest01.setStyle({radius: 5.0, fillColor: 'green', fillOpacity: 0.05, weight: 2, color: 'green'});
+    maptopo.addLayer(forerest01);
+    
+
+    var tempMarker= L.Icon.extend({
+        shadowUrl: null,
+        iconAnchor: new L.Point(12, 12),
+        iconSize: new L.Point(20, 20),
+    });
+
+    maptopo.dragging.disable();
+    maptopo.doubleClickZoom.disable();
+    maptopo.scrollWheelZoom.disable();
+
+    L.control.scale().addTo(maptopo); 
+
+
+    var logo= L.control({ //ใส่ n arrow
+        position : 'topright'
+        });
+        logo.onAdd = function(map) {
+            this._div = L.DomUtil.create('div', 'myControl');
+            var img_log = "<div class=myClass><img src=images/n_arrow.svg style='width: 3.5cm; height: 3.5cm'></div>";
+        
+            this._div.innerHTML = img_log;
+            return this._div;
+        
+        }
+        logo.addTo(maptopo);
+
+
+    //////////////////////////////////////ส่วนของortho/////////////////////////////////////////
+
+    var maportho = new L.Map('maportho',{zoomControl:false, zoomSnap: 0.01, touchZoom:!L.Browser.mobile}).setView([<%= xyortho.newcenter %>], <%= xyortho.zoom%>),
+
+        stamenTerrain = L.tileLayer('<%- orthomap %>',{zoomControl:false, maxZoom:25, zoomSnap: 0.01, minZoom:10, maxNativeZoom: 16, minNativeZoom: 12}).addTo(maportho);
+        maportho.attributionControl.setPrefix('');
+
+
+
+
+    '<% if (check_legend == "1") { %>'
+    '<% for (var i = 0; i < jsondata.length; i++) { %>'
+    '<% if (jsondata[i].features[1] != null) { %>'
+    '<% jsondata[i].features.pop() } %>'
+
+        var data_item_or_<%= i %> = L.geoJson(<%- JSON.stringify((jsondata)[i]) %>,
+            { pointToLayer: function (feature, latlng) 
+                {return L.circleMarker(latlng, tempMarker);}
+            }).addTo(maportho); 
+        data_item_or_<%= i %>.setStyle({radius: 6.0, fillColor: '<%= colorArr[i] %>', fillOpacity: 0.2, weight: 4, color: '<%= colorArr[i] %>'});
+
+    '<% } %>'
+    '<% } else { %>'
+    var data_item_or = L.geoJson(<%- (raw_jsondata) %>,
+        { pointToLayer: function (feature, latlng) 
+            {return L.circleMarker(latlng, tempMarker);}
+        }).addTo(maportho); 
+    data_item_or.setStyle({radius: 6.0, fillColor: 'red', fillOpacity: 0.2, weight: 4, color: 'red'});
+    '<% } %>'
+
+
+    var forerest01 = L.geoJson(FOREST01,
+        { pointToLayer: function (feature, latlng) 
+            {return L.circleMarker(latlng, tempMarker);}
+        }).addTo(maportho);
+    forerest01.setStyle({radius: 5.0, fillColor: 'green', fillOpacity: 0.05, weight: 2, color: 'green'});
+    maportho.addLayer(forerest01);
+
+
+    maportho.dragging.disable();
+    maportho.doubleClickZoom.disable();
+    maportho.scrollWheelZoom.disable();
+
+    L.control.scale().addTo(maportho); 
+
+    var logo2= L.control({ //ใส่ n arrow
+        position : 'topright'
+        });
+        logo2.onAdd = function(map) {
+            this._div = L.DomUtil.create('div', 'myControl');
+            var img_log = "<div class=myClass><img src=images/n_arrow1.svg style='width: 3.5cm; height: 3.5cm'></div>";
+        
+            this._div.innerHTML = img_log;
+            return this._div;
+        
+        }
+        logo2.addTo(maportho);
+
+    var grid= L.control({ //ใส่ n arrow
+        position : 'topleft'
+        });
+        grid.onAdd = function(map) {
+            this._div = L.DomUtil.create('div', 'myControl');
+            var img_log = "<div class=myClass><img src=images/grid_or.png style='width: 26.8cm; height: 29.48cm'></div>";
+        
+            this._div.innerHTML = img_log;
+            return this._div;
+        
+        }
+        grid.addTo(maportho); 
+
+    /////////////////////////////////////ส่วนของindex/////////////////////////////////////////
+
+    var index = new L.Map('mapindex',{zoomControl:false, zoomSnap: 0.05, maxZoom:15, minZoom:7}).setView([18.80, 100.80], 13),
+
+        stamenTerrain = null;
+        index.attributionControl.setPrefix('<b>จังหวัดน่าน</b>');
+
+    var province = L.geoJson(nan00000).addTo(index);
+
+    province.setStyle({fillColor: 'black', fillOpacity: 0.0, weight: 2, color: 'black'});
+
+    index.addLayer(province);
+    index.fitBounds(province.getBounds());
+
+    var marker1 = new L.circleMarker([<%= xytopo.newcenter %>]); 
+    var marker2 = new L.circleMarker([<%= xytopo.newcenter %>]); 
+    marker1.addTo(index);
+    marker2.addTo(index);
+
+    marker1.setStyle({radius: 3, fillColor: 'red', fillOpacity: 1, weight: 6, color: 'red'});
+    marker2.setStyle({radius: 11, fillColor: 'red', fillOpacity: 0, weight: 3, color: 'red'});
+    index.addLayer(marker1);
+
+
+    index.dragging.disable();
+    index.doubleClickZoom.disable();
+    index.scrollWheelZoom.disable();
+
+
+/////////////////////////////////////ส่วนของindex ของ ortho/////////////////////////////////////////
+
+    var index2 = new L.Map('mapindex2',{zoomControl:false, zoomSnap: 0.05, maxZoom:15, minZoom:7}).setView([18.80, 100.80], 13),
+
+        stamenTerrain = null;
+        index2.attributionControl.setPrefix('<b>จังหวัดน่าน</b>');
+
+    var province = L.geoJson(nan00000).addTo(index2);
+
+    province.setStyle({fillColor: 'black', fillOpacity: 0.0, weight: 2, color: 'black'});
+
+    index2.addLayer(province);
+    index2.fitBounds(province.getBounds());
+
+    index.addLayer(forerest01);
+    index2.addLayer(forerest01);
+
+    var marker3 = new L.circleMarker([<%= xytopo.newcenter %>]); 
+    var marker4 = new L.circleMarker([<%= xytopo.newcenter %>]); 
+    marker3.addTo(index2);
+    marker4.addTo(index2);
+
+    marker3.setStyle({radius: 3, fillColor: 'red', fillOpacity: 1, weight: 6, color: 'red'});
+    marker4.setStyle({radius: 11, fillColor: 'red', fillOpacity: 0, weight: 3, color: 'red'});
+    index.addLayer(marker3);
+
+
+    index2.dragging.disable();
+    index2.doubleClickZoom.disable();
+    index2.scrollWheelZoom.disable();
+
+
+</script>
+
+
+
+<script>
+
+    function dwltopo() {
+    let titlex = '<%= filename %>';
+
+    alert ("กำลังส่งออกแผนที่ กรุณารอสักครุ่ ขั้นตอนนี้อาจใช้เวลาประมาณ 5-10 วินาที หากไม่เริ่มต้นการดาวน์โหลด กรุณาติดต่อศูนย์ภูมิสารสนเทศฯ");
+    domtoimage.toBlob(document.getElementById('topographicmap'))
+        .then(function(blob) {
+          window.saveAs(blob, titlex+'_topo.png');
+        });
+    }
+
+    function dwlortho() {
+    let titlex = '<%= filename %>';
+
+    alert ("กำลังส่งออกแผนที่ กรุณารอสักครุ่ ขั้นตอนนี้อาจใช้เวลาประมาณ 5-10 วินาที หากไม่เริ่มต้นการดาวน์โหลด กรุณาติดต่อศูนย์ภูมิสารสนเทศฯ");
+    domtoimage.toBlob(document.getElementById('orthomap'))
+        .then(function(blob) {
+          window.saveAs(blob, titlex+'_ortho.png');
+        });
+    }
+    
+</script>
+
+<%- include('layout/footer.ejs')%>

@@ -1,0 +1,73 @@
+<%- include('../layout/head.ejs')%>
+<%- include('../layout/navbar_admin.ejs')%>
+
+<div class="container d-flex justify-content-center mt-4">
+    <div class="bg-light p-1 rounded-3 shadow" style="height: auto; width: 100%">
+        <div class="text-end p-2"><img src='images/user.png' height='25px' width='25px'> GIS Admin
+    </div>
+    <div class="p-2 h5"><b><u>บัญชีผู้ใช้</u></b></p>
+
+</div>
+
+<% if (resultmsg == 'added') { %>
+    <div class='alert alert-success p-2 m-2 text-center'><i class="fa fa-check-square" aria-hidden="true"></i> เพิ่มข้อมูลในระบบแล้ว</div>
+    <% } else if (resultmsg == 'updated') { %>
+    <div class='alert alert-success p-2 m-2 text-center'><i class="fa fa-check-square" aria-hidden="true"></i> เพิ่ม/ปรับปรุงข้อมูลในระบบแล้ว</div>       
+    <% } else if (resultmsg == 'error') { %>
+    <div class='alert alert-danger p-2 m-2 text-center'><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ดำเนินการล้มเหลว มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้ง</div>      
+    <% } else if (resultmsg == 'error_add') { %>
+        <div class='alert alert-danger p-2 m-2 text-center'><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ดำเนินการล้มเหลว มีบางอย่างผิดพลาด หรือชื่อผู้ใช้นี้มีอยู่แล้ว กรุณาลองใหม่อีกครั้ง</div>     
+    <% } %>
+
+<table class="table table-hover" style='font-size:14px'>
+    <th>รหัส*</th>
+    <th>หน่วยงาน</th>
+    <th>ชื่อผู้ใช้</th>
+    <th>รหัสผ่าน</th>
+    <th>ที่อยู่</th>
+    <th>ที่ตั้งหน่วยงาน</th>
+    <th></th>
+    <th>อนุญาตให้เข้าสู่ระบบ</th>
+    <tr bgcolor="#FFFFAA" ><form method='POST' action='/update_user'>
+        <td><b>เพิ่มบัญชีหน่วยงานฯ</b></td>
+        <input type='hidden' value='' name='loginkey'>
+        <td><input class='form-control p-1' style='font-size:12px' type='text' value='' name='off'></td>
+        <td><input class='form-control p-1' style='font-size:12px' type='text' value='' name='username'></td>
+        <td><input class='form-control p-1' style='font-size:12px' type='text' value='' name='password'></td>
+        <td><input class='form-control p-1' style='font-size:12px' type='text' value='' name='address'></td>
+        <td><input class='form-control p-1' style='font-size:12px' type='text' value='' name='startup_xy'></td>
+        <td><input class='btn btn-warning p-1 px-2' style='font-size:12px' type='submit' value='เพิ่ม'></td>
+        </form>
+        <td></td>
+    </tr>
+<% for (var i = 0; i < data.length; i++) { %> 
+    <tr><form method='POST' action='/update_user'>
+        <td><%= data[i].loginkey %></td>
+        <input type='hidden' value='<%= data[i].loginkey %>' name='loginkey'>
+        <td><input class='form-control p-1' style='font-size:12px' type='text' value='<%= data[i].off %>' name='off'></td>
+        <td><%= data[i].username %></td>
+        <td><input class='form-control p-1' style='font-size:12px' type='text' value='<%= data[i].password %>' name='password'></td>
+        <td><input class='form-control p-1' style='font-size:12px' type='text' value='<%= data[i].address %>' name='address'></td>
+        <td><input class='form-control p-1' style='font-size:12px' type='text' value='<%= data[i].startup_xy %>' name='startup_xy'></td>
+        <td><input class='btn btn-primary p-1' style='font-size:12px' type='submit' value='อัพเดท'></td>
+        </form>
+        <td class='text-center'>
+            <% if (data[i].loginkey != '999999') { %>
+            <% if (data[i].allow == 1) { %>
+                <a href="/user_checked?check=0&loginkey=<%= data[i].loginkey%>"><img src="images/checked.svg"></a>
+            <% } else { %>
+                <a href="/user_checked?check=1&loginkey=<%= data[i].loginkey%>"><img src="images/unchecked.svg"></a>
+            <% } %>
+            <% } %>
+        </td>
+    </tr>
+<% } %>
+</table>
+<div class='p-2' style="font-size:12px;">
+    - คีย์หลัก (primary key) ระบบจะสร้างอัตโนมัติ เพื่อป้องกันข้อผิดพลาด<br>
+    - username เป็นค่าห้ามซ้ำ (unique) ไม่อนุญาตให้แก้ไข เพื่อป้องกันข้อผิดพลาด และโปรดเพิ่มด้วยความระมัดระวัง
+</div>
+</div>
+</div>
+
+<%- include('../layout/footer.ejs')%>
