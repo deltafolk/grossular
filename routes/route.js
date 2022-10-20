@@ -38,6 +38,7 @@ router.get ('/',(req, res)=>{
         res.redirect('/home');
     }
     else {
+        res.header("Access-Control-Allow-Origin", "*");
         res.render('login.ejs');
     }
     
@@ -885,13 +886,6 @@ router.post ('/export_map',(req, res)=>{
 // login result สร้าง session
 router.post ('/loginresult',(req, res)=>{
 
-    session = req.session;
-    if (session.loginkey != null){
-        res.redirect('/home');
-        return;
-    }
-
-    
     const obj_req = req.body; //req.body กรณีรับแบบ post | req.query กรณีรับแบบ get
     const username = req.body.username;
     const password = req.body.password;
@@ -919,13 +913,12 @@ router.post ('/loginresult',(req, res)=>{
             let sqlupdate = "UPDATE logindata SET times = '"+times+"', logintime = '"+date+"' WHERE loginkey LIKE '"+result[0].loginkey+"'";
 
             con.query(sqlupdate,(err, result)=>{
-
-                res.redirect('/home');
+                res.json(200,{title:'welcome'});
             });
 
         }
         else {
-            res.render('login.ejs',{loginresult:"error"});
+            res.json(200,{title:"error"});
         }
 
         });

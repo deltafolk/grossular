@@ -3,11 +3,15 @@ const path = require('path');
 const router = require('./routes/route.js');
 const app = express();
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+app.use(cors({
+    origin : '*',
+}))
 
 app.use(express.static(path.join(__dirname,'public'))) //ใช้กับ folder ที่เข้าถึงได้เลย เช่นที่เก็บ css เป็นต้น ใช้ต่อกับส่วนของ head.ejs
 
