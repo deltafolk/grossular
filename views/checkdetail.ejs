@@ -223,22 +223,29 @@
     <b>ชื่อหน่วยงาน</b> <%= data[0].offname %><br>
     <b>ปีงบประมาณ พ.ศ.</b> <%= data[0].year %><br>
     <b>จำนวนตามแผนงบประมาณ </b> <%= data[0].amount %> <% if (data[0].type == 'point') { %>แห่ง<% } else if (data[0].type == 'line') { %>กิโลเมตร<% } else { %>ไร่<% } %><br><br>
-    <b>ข้อมูลเชิงพื้นที่</b><br>
 
-
+    <% if (data_result != "") { %>
+    <% for (var j = 0; j < data_result.length; j++) { %>
+    <br>
+    <u><p class="text-center h5"><%=  data_result[j][0].name %></p></u>
     <table class='table table-hover'>
+        <th width="3%"></th>
+        <th width="17%">รายละเอียด</th>
         <th></th>
-        <th>อยู่ในพื้นที่</th>
-        <th class='text-center'>--------</th>
-        <th>รายละเอียดของพื้นที่</th>
-        <th class='text-center'>คิดเป็นร้อยละ</th>
-        <% for (var i = 0; i < data_result.length; i++) { %>
-            <tr><td class='text-center' style='color:<%= data_result[i].color %>;'>&#9632;</td><td><%= data_result[i].name %></td><td><% if (data[0].type == 'point') { %>แห่งที่ <% } else if (data[0].type == 'line') { %>เส้นที่ <% } else { %>แปลงที่ <% } %><%= data_result[i].feature %></td><td><%= data_result[i].desc_ %></td><td class='text-center'><%= data_result[i].percent %></td></tr>
+        <th width="10%" class='text-center'>ร้อยละ</th>
+        <% for (var i = 0; i < data_result[j].length; i++) { %>
+            <tr><td class='text-center' style='color:<%= data_result[j][i].color %>;'>&#9632;</td><td><% if (data[0].type == 'point') { %>แห่งที่ <% } else if (data[0].type == 'line') { %>เส้นที่ <% } else { %>แปลงที่ <% } %><%= data_result[j][i].feature %></td><td><%= data_result[j][i].desc_ %></td><td class='text-center'><%= data_result[j][i].percent %></td></tr>
         <% } %>
-
     </table>
+    <% } %>
+
     <div class='p-0 mx-4 my-0 text-dark' style='font-size:14px;'> <u>หมายเหตุ</u> ร้อยละของพื้นที่ อาจมีค่ามากกว่า หรือน้อยกว่า 100 เนื่องมาจากความคลาดเคลื่อนเชิงพื้นที่ของฐานข้อมูลหลัก การทับซ้อนของข้อมูลภายในฐานข้อมูลหลัก ข้อมูลอยู่นอกบริเวณพื้นที่ให้บริการ โปรดใช้ข้อมูลดังกล่าวด้วยความระมัดระวัง</div><br>
     </div>
+
+    <% } else { %>
+        <div class="alert alert-danger p-2 m-2 text-center"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> การประมวลผลข้อมูลเชิงพื้นที่ล้มเหลว ข้อมูลอาจอยู่นอกพื้นที่ให้บริการข้อมูล กรุณาลองใหม่อีกครั้ง</div>
+    <% } %>
+
     <p class='text-center p-2'>
 
         <a href="/home" class='btn btn-secondary'>ย้อนกลับ</a>
@@ -249,3 +256,5 @@
 
 
 <% } %>
+
+<%- include('layout/footer.ejs') %>

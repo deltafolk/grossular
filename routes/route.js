@@ -23,7 +23,7 @@ const mysql = require('mysql');
 const { parse } = require('path');
 const con = mysql.createConnection({
     host: "localhost",
-    port: 3309,
+    port: 3306,
     database: 'g1s_db',
     user: "root",
     password: ""
@@ -117,7 +117,7 @@ router.get ('/home',(req, res)=>{
 
                 con.query(sqlupdate,(err, resultx)=>{
 
-                    res.json(404,{result:result,off:off,resultmsg:resultmsg});
+                    res.render("home.ejs",{result:result,off:off,resultmsg:resultmsg});
 
                 });
 
@@ -162,11 +162,12 @@ router.get ('/new', (req, res)=>{ //:type ไม่ใช่ ?type=
 
         con.query(sqloff, (err, result)=>{
 
-            offdata = result;
+            offdata = blindPassword(result);
+
 
             if (typeinput != 'shp'){
 
-                res.render('new.ejs', {actdata:actdata,offdata:offdata,year:year});
+                res.render("new.ejs", {actdata:actdata,offdata:offdata,year:year});
             }
             else {
 
@@ -750,9 +751,11 @@ router.get ('/checkdetail',(req, res)=>{
 
         
                     let data = JSON.parse(resultx);
+                    let resulty = formatDetail(data.data_result);
+
                     //console.log(data.data_result);
         
-                    res.render('checkdetail.ejs',{data_result:data.data_result,data:data.data});
+                    res.render('checkdetail.ejs',{data_result:resulty,data:data.data});
                     return
 
                 });
@@ -792,7 +795,7 @@ router.get ('/checkdetail',(req, res)=>{
 router.post ('/showDetail',(req, res)=>{
 
     let data = JSON.parse(req.body.data);
-    let data_result = JSON.parse(req.body.data_result);
+    let data_result = formatDetail(JSON.parse(req.body.data_result));
 
     //สร้าง cache
 
@@ -1977,5 +1980,34 @@ function formatChar(input){
         return input;
     };
 }
+
+function blindPassword(result){
+    for (let i = 0; i < result.length; i++){
+        result[i].username = '';
+        result[i].password = '';
+    }
+    return result;
+}
+
+
+function formatDetail(data_result){
+    let arr = []
+    let arr2 = []
+    arr2.push(data_result[0])
+    for (let i = 1; i < data_result.length; i++) {
+        if (data_result[i].dbkeyname == data_result[i-1].dbkeyname) {
+            arr2.push(data_result[i])
+        } else {
+            arr.push(arr2)
+            arr2 = [data_result[i]];
+        }
+    }
+    if (arr2 != []){
+        arr.push(arr2)
+    }
+    
+    return arr;
+}
+
 
 module.exports = router;
