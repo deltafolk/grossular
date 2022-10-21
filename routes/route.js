@@ -39,7 +39,7 @@ router.get ('/',(req, res)=>{
     }
     else {
         res.header("Access-Control-Allow-Origin", "*");
-        res.render('login.ejs');
+        res.json(200, {title:"grossular ศูนย์ GISNAN"});
     }
     
 })
@@ -72,7 +72,7 @@ router.get ('/home',(req, res)=>{
 
     const checkRecent = require('../programs/checkRecent.js');
 
-    session = req.session;
+    /*session = req.session;
     if (session.loginkey == null){
         res.redirect('/');
         return;
@@ -81,7 +81,7 @@ router.get ('/home',(req, res)=>{
     if (session.loginkey == '999999'){
         res.redirect('/admin');
         return;
-    }
+    }*/
 
     let resultmsg = req.query.resultmsg;
     let logindata = session.loginkey;
@@ -115,10 +115,13 @@ router.get ('/home',(req, res)=>{
 
 
             let sqlupdate = "UPDATE logindata SET logintime = '"+date+"' WHERE loginkey LIKE '"+session.loginkey+"'";
+            
+            var crypto = require('crypto');
+            var token = crypto.randomBytes(64).toString('hex');
 
                 con.query(sqlupdate,(err, resultx)=>{
 
-                    res.render("home.ejs",{result:result,off:off,resultmsg:resultmsg});
+                    res.json(200,{token:token,result:result,off:off,resultmsg:resultmsg});
 
                 });
 
@@ -894,7 +897,10 @@ router.post ('/loginresult',(req, res)=>{
 
     con.query(search_query,(err, result)=>{
 
-        if (err) { throw (err)};
+        if (err) { 
+            res.json(200,{title:"batabase connection error",status:'err'});
+            return; 
+        };
         
         if (result.length != 0){
             session = req.session;
@@ -913,12 +919,12 @@ router.post ('/loginresult',(req, res)=>{
             let sqlupdate = "UPDATE logindata SET times = '"+times+"', logintime = '"+date+"' WHERE loginkey LIKE '"+result[0].loginkey+"'";
 
             con.query(sqlupdate,(err, result)=>{
-                res.json(200,{title:'welcome'});
+                res.redirect('/home');
             });
 
         }
         else {
-            res.json(200,{title:"error"});
+            res.json(200,{title:"wrong username or password",status:'err'});
         }
 
         });
