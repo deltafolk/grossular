@@ -68,11 +68,11 @@ router.get ('/jsdata/:idkey',(req, res)=>{
 })
 
 // หน้าหลัก
-router.get ('/home',(req, res)=>{
+/*router.get ('/home',(req, res)=>{
 
     const checkRecent = require('../programs/checkRecent.js');
 
-    /*session = req.session;
+    session = req.session;
     if (session.loginkey == null){
         res.redirect('/');
         return;
@@ -81,7 +81,7 @@ router.get ('/home',(req, res)=>{
     if (session.loginkey == '999999'){
         res.redirect('/admin');
         return;
-    }*/
+    }
 
     let resultmsg = req.query.resultmsg;
     let logindata = session.loginkey;
@@ -118,6 +118,8 @@ router.get ('/home',(req, res)=>{
             
             var crypto = require('crypto');
             var token = crypto.randomBytes(64).toString('hex');
+            let loginkey = result[0].loginkey;
+            //console.log(result)
 
                 con.query(sqlupdate,(err, resultx)=>{
 
@@ -128,7 +130,49 @@ router.get ('/home',(req, res)=>{
         });
 
     
-});
+});*/
+
+router.post ('/item', (req, res)=>{
+    //const obj_req = req.body; //req.body กรณีรับแบบ post | req.query กรณีรับแบบ get
+    const token = req.body.token;
+    let offkey = req.body.offkey;
+    let sqlx;
+    
+    if (token == '' || offkey == ''){
+        res.json(200,{title:'not allowed'});
+        return
+    }
+
+    if (offkey == '00') {
+        sqlx = "SELECT * FROM taskdata ORDER BY offname";
+        const _query = mysql.format(sqlx)
+
+        con.query(_query,(err, result)=>{
+            //console.log (result);
+            if (err){
+                //res.json(200, {data:result});
+            }
+            else {
+                res.json(200, {data:result});
+            }
+        });
+    } else {
+        sqlx = "SELECT * FROM taskdata WHERE offkey LIKE ? ORDER BY offname";
+        const _query = mysql.format(sqlx,[offkey])
+
+        con.query(_query,(err, result)=>{
+            console.log (result);
+            if (err){
+                //res.json(200, {data:result});
+            }
+            else {
+                res.json(200, {data:result});
+            }
+        });
+    }
+
+
+})
 
 //เพิ่มข้อมูลใหม่
 router.get ('/new', (req, res)=>{ //:type ไม่ใช่ ?type=
@@ -894,6 +938,8 @@ router.post ('/loginresult',(req, res)=>{
     const password = req.body.password;
     let sql = "SELECT * FROM logindata WHERE username = ? AND password = ? AND allow = ?";
     const search_query = mysql.format(sql,[username, password, 1])
+    var crypto = require('crypto');
+    var token = crypto.randomBytes(64).toString('hex');
 
     con.query(search_query,(err, result)=>{
 
@@ -918,8 +964,9 @@ router.post ('/loginresult',(req, res)=>{
 
             let sqlupdate = "UPDATE logindata SET times = '"+times+"', logintime = '"+date+"' WHERE loginkey LIKE '"+result[0].loginkey+"'";
 
-            con.query(sqlupdate,(err, result)=>{
-                res.redirect('/home');
+            con.query(sqlupdate,(err, resultx)=>{
+                //res.json(200,{title:"wrong username or password",status:'sucess'});
+                res.json(200,{token:token,offkey:result[0].loginkey,offname:result[0].off,status:'sucess'});
             });
 
         }
@@ -933,7 +980,7 @@ router.post ('/loginresult',(req, res)=>{
 
 
 // logout clear session & redirect ไปที่ /
-router.get('/logout', (req, res) => {
+/*router.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
     return;
