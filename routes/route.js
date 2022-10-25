@@ -148,6 +148,11 @@ router.post ('/item', (req, res)=>{
         const _query = mysql.format(sqlx)
 
         con.query(_query,(err, result)=>{
+
+            for (let j = 0; j < result.length; j++){
+                result[j]["color"] = getColorHEX();
+            }
+
             //console.log (result);
             if (err){
                 //res.json(200, {data:result});
@@ -161,7 +166,12 @@ router.post ('/item', (req, res)=>{
         const _query = mysql.format(sqlx,[offkey])
 
         con.query(_query,(err, result)=>{
-            console.log (result);
+            //console.log (result);
+
+            for (let j = 0; j < result.length; j++){
+                result[j]["color"] = getColorHEX();
+            }
+
             if (err){
                 //res.json(200, {data:result});
             }
