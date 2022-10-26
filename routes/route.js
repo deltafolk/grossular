@@ -202,45 +202,70 @@ router.post ('/new', (req, res)=>{
         year.push(d_year+i);
     }
 
-    sqlx = "SELECT * FROM actdata ORDER BY acttype";
-    sqly = "SELECT * FROM main_db WHERE type NOT LIKE 'raster' AND allow = '1' ORDER BY type";
+    sqlx = "SELECT * FROM actdata ORDER BY acttype, actname";
     sqlz = "SELECT loginkey, off, address FROM logindata WHERE loginkey NOT LIKE '999999' AND loginkey NOT LIKE '00' ORDER BY off";
 
     const _query = mysql.format(sqlx)
-    const _query2 = mysql.format(sqly)
     const _query3 = mysql.format(sqlz)
 
     con.query(_query,(err, resultx)=>{
-        con.query(_query2,(err, resulty)=>{
+
             con.query(_query3,(err, resultz)=>{
                 //console.log (resultz);
-                for (let j = 0; j < resulty.length; j++){
 
-                    let jsonfromfile = fs.readFileSync(__dirname + '/../vectors/'+resulty[j].keyname+'.js',
-                    {encoding:'utf8', flag:'r'});
-
-                    
-                    resulty[j]["main_data"] = jsonfromfile;
-                    //console.log(resulty[0])
-
-                    /*fs.readFile(__dirname + '/../vectors/'+resulty[j].keyname+'.js', 'utf8' , (err, data) => {
-
-                        
-                        //console.log(jsonfromfile)
-
-                        resulty[j]["main_data"] = jsonfromfile;
-                        console.log(resulty[0])
-                    })*/
-                }
                 if (err){
                     //res.json(200, {data:'err'});
                 }
                 else {
-                    res.json(200, {act:resultx, off:resultz, main_db:resulty, year:year});
+                    res.json(200, {act:resultx, off:resultz, year:year});
                 }
             })
-        })
+
     });
+
+})
+
+
+
+router.post ('/edit', (req, res)=>{
+    const token = req.body.token;
+    
+    let sqlx;
+    
+    if (token == ''){
+        res.json(200,{title:'not allowed'});
+        return
+    }
+
+    const d = new Date();
+    let d_year = (d.getFullYear()) + 543;
+    let year = [];
+
+    for (var i = -2; i <= 2; i++){
+        year.push(d_year+i);
+    }
+
+    sqly = "SELECT * FROM main_db WHERE type NOT LIKE 'raster' AND allow = '1' ORDER BY type";
+
+    const _query2 = mysql.format(sqly)
+
+    con.query(_query2,(err, resulty)=>{
+
+        //console.log (resultz);
+        for (let j = 0; j < resulty.length; j++){
+
+            let jsonfromfile = fs.readFileSync(__dirname + '/../vectors/'+resulty[j].keyname+'.js',
+            {encoding:'utf8', flag:'r'});
+            resulty[j]["main_data"] = jsonfromfile;
+        }
+        if (err){
+        //res.json(200, {data:'err'});
+        }
+        else {
+            res.json(200, {main_db:resulty});
+         }
+
+    })
 
 })
 
