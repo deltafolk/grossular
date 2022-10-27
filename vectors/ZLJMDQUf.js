@@ -1,4 +1,4 @@
-var ZLJMDQUf = {
+{
 "type": "FeatureCollection",
 "name": "ที่ตั้งหน่วยงาน สบอ",
 "crs": { "type": "name", "properties": { "name": "EPSG:4326" } },
@@ -113,4 +113,3 @@ var ZLJMDQUf = {
 { "type": "Feature", "properties": { "ID": 108, "name": "สถานีควบคุมไฟป่านันทบุรี", "x": 678124, "y": 2113343, "address": "ต.ศรีภูมิ อ.ท่าวังผา จ.น่าน", "type": "ส่วนควบคุมและปฏิบัติการไฟป่า", "OBJECTID": 108, "DESC_": "ส่วนควบคุมและปฏิบัติการไฟป่า | สถานีควบคุมไฟป่านันทบุรี" }, "geometry": { "type": "Point", "coordinates": [ 100.693265, 19.105324 ] } }
 ]
 }
-;

@@ -269,6 +269,49 @@ router.post ('/edit', (req, res)=>{
 
 })
 
+router.put ('/add_data', (req, res)=>{
+    const token = req.body.token;
+
+    let offkey = req.body.offkey;
+    let offname = req.body.offname;
+    let actkey = req.body.actkey;
+    let actname = req.body.actname;
+    let type_ = req.body.acttype;
+    let year_ = req.body.year;
+    let amount = req.body.amount;
+    let note = req.body.note;
+    let jsondata = req.body.jsondata;
+
+    let hex1 = genHexString(8);
+    let hex2 = genHexString(8);
+
+    let m = new Date();
+    let date =
+        ("0" + m.getUTCDate()).slice(-2) + "-" +
+        ("0" + (m.getUTCMonth()+1)).slice(-2) + "-" +
+        m.getUTCFullYear() + " " +
+        ("0" + m.getUTCHours()).slice(-2) + ":" +
+        ("0" + m.getUTCMinutes()).slice(-2);
+
+    if(offkey != '' && offname != '' && actkey != '' && actname != '' && type_ != '' && year_ != '' && amount != '' && jsondata != ''){
+        let sqltask = "INSERT INTO taskdata (idkey, offkey, type, offname, actkey, actname, year, amount, date, note, jsondata, publickey, overlap_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const insert_query = mysql.format(sqltask,[hex1, offkey, type_, offname, actkey, actname, year_, amount, date, note, JSON.stringify(jsondata), hex2, '']);
+        con.query(insert_query,(err, result)=>{
+            if (err) { 
+                
+                res.json(200,{title:'error',desc: 'sql_error'});
+                throw (err)
+                console.log(err)
+            };
+            
+                res.json(200,{title:'completed'});
+        });
+    } else {
+        res.json(200,{title:'error',desc: 'null_value'});
+    }
+
+})
+
 //เพิ่มข้อมูลใหม่
 /*router.get ('/new', (req, res)=>{ //:type ไม่ใช่ ?type=
 

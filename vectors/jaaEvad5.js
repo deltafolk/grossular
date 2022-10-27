@@ -1,4 +1,4 @@
-var jaaEvad5 = {
+{
 "type": "FeatureCollection",
 "name": "testjson02",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
@@ -848,4 +848,3 @@ var jaaEvad5 = {
 { "type": "Feature", "properties": { "fid_l08_vi": 31459, "p_name_t": "จังหวัดน่าน", "p_name_e": "CHANGWAT NAN", "a_name_t": "อำเภอเฉลิมพระเกียรติ", "a_name_e": "AMPHOE CHAROEM PHRAKIAT", "t_name_t": "ตำบลห้วยโก๋น", "t_name_e": null, "v_name_t": "บ้านปางหก", "v_name_e": "Ban Pang Hok", "source_dat": "2011\/12\/30", "fid_l05_ta": 4695, "tambon_t": "ห้วยโก๋น", "tambon_e": "Huai Kon", "amphoe_t": "เฉลิมพระเกียรติ", "amphoe_e": "Chaloem Phra Kiat", "changwat_t": "น่าน", "changwat_e": "Nan", "DESC_": "บ้านปางหก" }, "geometry": { "type": "MultiPoint", "coordinates": [ [ 100.976613, 19.59886 ] ] } }
 ]
 }
-;
