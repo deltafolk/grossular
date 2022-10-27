@@ -292,6 +292,12 @@ router.put ('/add_data', (req, res)=>{
         m.getUTCFullYear() + " " +
         ("0" + m.getUTCHours()).slice(-2) + ":" +
         ("0" + m.getUTCMinutes()).slice(-2);
+    
+
+    if (token == ''){
+        res.json(200,{title:'not allowed'});
+        return
+    }
 
     if(offkey != '' && offname != '' && actkey != '' && actname != '' && type_ != '' && year_ != '' && amount != '' && jsondata != ''){
         let sqltask = "INSERT INTO taskdata (idkey, offkey, type, offname, actkey, actname, year, amount, date, note, jsondata, publickey, overlap_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -302,13 +308,43 @@ router.put ('/add_data', (req, res)=>{
                 res.json(200,{title:'error',desc: 'sql_error'});
                 throw (err)
                 console.log(err)
-            };
-            
+            }
+            else {
                 res.json(200,{title:'completed'});
+            }
         });
     } else {
         res.json(200,{title:'error',desc: 'null_value'});
     }
+
+})
+
+router.delete('/delete',(req, res)=>{
+    const token = req.body.token;
+    let idkey = req.body.idkey;
+
+    //console.log(req.body.idkey,req.body.token,'//**')
+
+    if (token == ''){
+        res.json(200,{title:'not allowed'});
+        return
+    }
+
+    let sqltask = "DELETE FROM taskdata WHERE idkey LIKE ?";
+    
+    const _query2 = mysql.format(sqltask,[idkey])
+    console.log(_query2)
+
+    con.query(_query2,(err, result)=>{
+        if (err) {  
+            res.json(200,{title:'error',desc: 'sql_error'});
+            throw (err)
+            console.log(err)
+        }
+        else {
+            res.json(200,{title:'deleted'});
+        }
+    })
 
 })
 
