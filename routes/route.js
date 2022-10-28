@@ -348,6 +348,32 @@ router.delete('/delete',(req, res)=>{
 
 })
 
+
+router.post('/newmap',(req, res)=>{
+    const token = req.body.token;
+    let idkey = req.body.id;
+
+    let sqltask = "SELECT * FROM taskdata WHERE idkey LIKE ?";
+    let sqly = "SELECT * FROM main_db WHERE type LIKE 'raster' AND allow LIKE '1' ORDER BY name";
+
+    const query1 = mysql.format(sqly)
+    const query2 = mysql.format(sqltask,[idkey])
+
+    con.query(query1,(err, resultx)=>{
+        con.query(query2,(err, result)=>{
+            if (err) {  
+                res.json(200,{title:'error',desc: 'sql_error'});
+                throw (err)
+                console.log(err)
+            }
+            else {
+                res.json(200,{data:result,main_data:resultx});
+            }
+        })
+    })
+
+})
+
 //เพิ่มข้อมูลใหม่
 /*router.get ('/new', (req, res)=>{ //:type ไม่ใช่ ?type=
 
